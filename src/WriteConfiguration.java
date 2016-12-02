@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.List;
 
 /**
  * Created by apu on 04.11.2016.
@@ -17,11 +18,11 @@ public class WriteConfiguration extends SwingWorker{
         for(int ptr=0;ptr<2;ptr++) {
             switch(ptr){
                 case 0:
-                        data = main.config.getGsmServer().getBytes();
+                        data = settings.getSet().get(main.param.GSM_SERVER).getBytes();
                         message = "Gsm Server write done.";
                         break;
                 case 1:
-                        data = main.config.getGsmMoneyQuery().getBytes();
+                        data = settings.getSet().get(main.param.GSM_MONEY_QUERY).getBytes();
                         message = "Gsm Money Query write done.";
                         break;
                 default:
@@ -37,17 +38,25 @@ public class WriteConfiguration extends SwingWorker{
                 if(main.port.isComPortHasData() == true)
                 {
                     if(main.port.waitOk()) {
-                        main.mainF.textArea.append("OK.\r\n");
+                        publish(new String("OK.\r\n"));
                         break;
                     }
                 }
             }
 
             Thread.sleep(200);
-            main.mainF.textArea.append(message + "\r\n");
+            publish(new String(message + "\r\n"));
         }
         main.port.comPortDisableListener();
         //main.mainF.buttonPortOpenClose.setEnabled(true);
         return null;
+    }
+
+    @Override
+    protected void process(List chunks) {
+        super.process(chunks);
+        for(int i=0;i<chunks.size();i++){
+            main.gui.textArea.append(chunks.get(i).toString());
+        }
     }
 }

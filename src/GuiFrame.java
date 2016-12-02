@@ -12,16 +12,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by apu on 02.11.2016.
  */
-public class MainFrame extends JFrame{
-    public JPanel          panelTop;
+public class GuiFrame extends JFrame{
+
+    private Map<main.param,Object> map;
+
+    private WriteConfiguration  writeConfig;
+    private AnswerConfiguration answerConfig;
+
+    public JPanel           panelTop;
     private JPanel          panelCenter;
     private LayoutManager   layoutMain;
     private GroupLayout     panelCenterLayout;
@@ -43,18 +53,21 @@ public class MainFrame extends JFrame{
     private JTextField      inputGprsPage;
     private JLabel          labelGprsTimeout;
     private JTextField      inputGprsTimeout;
+    private JScrollPane     scrollpane;
 
     public JTextArea textArea;
 
-    private WriteConfiguration  writeConfig;
-    private AnswerConfiguration answerConfig;
+    private ChangeListener  propertyChangeListener;
 
-    public MainFrame(){
-        super();
-        main.config = new Configuration();
+    public Map<main.param, Object> getGui() {
+        return map;
     }
 
-    public void start(){
+    public GuiFrame(){
+        //super();
+
+        map = new HashMap<main.param,Object>();
+
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600, 700);
         setLocation(200,200);
@@ -64,35 +77,70 @@ public class MainFrame extends JFrame{
         getContentPane().setLayout(layoutMain);
 
         buttonOpen = new JButton();
-        buttonOpen.setText("Open File");
-        buttonOpen.addActionListener(new openButtonAction());
-
         buttonSave = new JButton();
-        buttonSave.setText("Save File");
-        buttonSave.addActionListener(new saveButtonAction());
-
         buttonRead = new JButton();
-        buttonRead.setText("Read Data");
-        buttonRead.setEnabled(false);
-        buttonRead.addActionListener(new readButtonAction());
-
         buttonWrite = new JButton();
-        buttonWrite.setText("Write Data");
-        buttonWrite.setEnabled(false);
-        buttonWrite.addActionListener(new writeButtonAction());
-
         buttonPortOpenClose = new JButton();
-        buttonPortOpenClose.setText("Port Open");
-        buttonPortOpenClose.addActionListener(new portOpenCloseButtonAction());
-
         comboBox = new JComboBox(main.port.portNames);
-        comboBox.addActionListener(new comboBoxAction());
-        comboBox.setBorder(BorderFactory.createEmptyBorder(5, 25, 5, 5));
-
         panelTop = new JPanel();
+        textArea = new JTextArea();
+        scrollpane = new JScrollPane(textArea,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        labelGsmServer = new JLabelBorder();
+        inputGsmServer = new LimitTextField();
+        labelGsmMoneyQuery = new JLabelBorder();
+        inputGsmMoneyQuery = new LimitTextField();
+        labelGprsServer = new JLabelBorder();
+        inputGprsServer = new LimitTextField();
+        labelGprsPort = new JLabelBorder();
+        inputGprsPort = new LimitTextField();
+        labelGprsTimeout = new JLabelBorder();
+        inputGprsTimeout = new LimitTextField();
+        panelCenter = new JPanel();
+
+        map.put(main.param.GSM_SERVER,inputGsmServer);
+        map.put(main.param.GSM_MONEY_QUERY,inputGsmMoneyQuery);
+        map.put(main.param.GPRS_SERVER,inputGprsServer);
+        map.put(main.param.GPRS_PORT,inputGprsPort);
+
+        buttonOpen.setText("Open File");
+        buttonSave.setText("Save File");
+        buttonRead.setText("Read Data");
+        buttonWrite.setText("Write Data");
+        buttonPortOpenClose.setText("Port Open");
+        labelGsmServer.setText("GSM server address (www.kyivstar.net):  ");
+        inputGsmServer.setText(settings.getSet().get(main.param.GSM_SERVER));
+        labelGsmMoneyQuery.setText("GSM check money query (*111#):  ");
+        inputGsmMoneyQuery.setText(settings.getSet().get(main.param.GSM_MONEY_QUERY));
+        labelGprsServer.setText("GPRS server address:  ");
+        inputGprsServer.setText(settings.getSet().get(main.param.GPRS_SERVER));
+        labelGprsPort.setText("GPRS port number:  ");
+        inputGprsPort.setText(settings.getSet().get(main.param.GPRS_PORT));
+        labelGprsTimeout.setText("GPRS update timeout(seconds):  ");
+        inputGprsTimeout.setText("0");
+
+        buttonRead.setEnabled(false);
+        buttonWrite.setEnabled(false);
+        comboBox.setBorder(BorderFactory.createEmptyBorder(5, 25, 5, 5));
         panelTop.setLayout(new FlowLayout(FlowLayout.CENTER));
+        textArea.setRows(10);
         panelTop.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panelTop.setPreferredSize(new Dimension(getContentPane().getWidth(),100));
+        scrollpane.setAutoscrolls(true);
+        panelCenterLayout = new GroupLayout(panelCenter);
+        panelCenter.setLayout(panelCenterLayout);
+        panelCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        buttonOpen.addActionListener(new openButtonAction());
+        buttonSave.addActionListener(new saveButtonAction());
+        buttonRead.addActionListener(new readButtonAction());
+        buttonWrite.addActionListener(new writeButtonAction());
+        buttonPortOpenClose.addActionListener(new portOpenCloseButtonAction());
+        comboBox.addActionListener(new comboBoxAction());
+        textArea.addPropertyChangeListener(propertyChangeListener);
+        inputGsmServer.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmServer)));
+        inputGsmServer.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmServer)));
+        inputGsmMoneyQuery.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmMoneyQuery)));
+        inputGsmMoneyQuery.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmMoneyQuery)));
 
         panelTop.add(buttonOpen);
         panelTop.add(buttonSave);
@@ -102,70 +150,24 @@ public class MainFrame extends JFrame{
         panelTop.add(buttonPortOpenClose);
 
         getContentPane().add(panelTop,BorderLayout.NORTH);
-
-        textArea = new JTextArea();
-        textArea.setRows(10);
-        JScrollPane scrollpane = new JScrollPane(textArea,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollpane.setAutoscrolls(true);
-
         getContentPane().add(scrollpane,BorderLayout.SOUTH);
 
-        labelGsmServer = new JLabelBorder();
-        labelGsmServer.setText("GSM server address (www.kyivstar.net):  ");
-
-        inputGsmServer = new LimitTextField();
-        inputGsmServer.setText(main.config.getGsmServer());
-        inputGsmServer.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmServer)));
-        inputGsmServer.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmServer)));
-
-        labelGsmMoneyQuery = new JLabelBorder();
-        labelGsmMoneyQuery.setText("GSM check money query (*111#):  ");
-
-        inputGsmMoneyQuery = new LimitTextField();
-        inputGsmMoneyQuery.setText(main.config.getGsmMoneyQuery());
-        inputGsmMoneyQuery.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmMoneyQuery)));
-        inputGsmMoneyQuery.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmMoneyQuery)));
-
-        labelGprsServer = new JLabelBorder();
-        labelGprsServer.setText("GPRS server address:  ");
-
-        inputGprsServer = new LimitTextField();
-        inputGprsServer.setText(main.config.getGprsServer());
-
-        labelGprsPort = new JLabelBorder();
-        labelGprsPort.setText("GPRS port number:  ");
-
-        inputGprsPort = new LimitTextField();
-        inputGprsPort.setText(String.valueOf(main.config.getGprsPort()));
-
-        labelGprsTimeout = new JLabelBorder();
-        labelGprsTimeout.setText("GPRS update timeout(seconds):  ");
-
-        inputGprsTimeout = new LimitTextField();
-        inputGprsTimeout.setText(String.valueOf(main.config.getGprsTimeout()));
-
-
-        panelCenter = new JPanel();
-        panelCenterLayout = new GroupLayout(panelCenter);
-        panelCenter.setLayout(panelCenterLayout);
-        panelCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
         panelCenterLayout.setHorizontalGroup(panelCenterLayout.createSequentialGroup()
-                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addGroup(panelCenterLayout.createSequentialGroup()
-                                                .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                        .addComponent(labelGsmServer)
-                                                        .addComponent(labelGsmMoneyQuery)
-                                                        .addComponent(labelGprsServer)
-                                                        .addComponent(labelGprsPort)
-                                                        .addComponent(labelGprsTimeout))
-                                                .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                        .addComponent(inputGsmServer)
-                                                        .addComponent(inputGsmMoneyQuery)
-                                                        .addComponent(inputGprsServer)
-                                                        .addComponent(inputGprsPort)
-                                                        .addComponent(inputGprsTimeout))
-                                )));
+                .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                .addComponent(labelGsmServer)
+                                                .addComponent(labelGsmMoneyQuery)
+                                                .addComponent(labelGprsServer)
+                                                .addComponent(labelGprsPort)
+                                                .addComponent(labelGprsTimeout))
+                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                .addComponent(inputGsmServer)
+                                                .addComponent(inputGsmMoneyQuery)
+                                                .addComponent(inputGprsServer)
+                                                .addComponent(inputGprsPort)
+                                                .addComponent(inputGprsTimeout))
+                        )));
         //panelCenterLayout.linkSize(SwingConstants.HORIZONTAL, inputGsmServer, inputGsmMoneyQuery);
         panelCenterLayout.setVerticalGroup(panelCenterLayout.createSequentialGroup()
                         .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -192,8 +194,19 @@ public class MainFrame extends JFrame{
         setVisible(true);
     }
 
+    class ChangeListener implements PropertyChangeListener {
 
-    class portOpenCloseButtonAction implements ActionListener{
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            String pName = evt.getPropertyName();
+            Object pValue = evt.getNewValue();
+            if(pName.equals("TEXT_AREA")){
+                textArea.append((String)pValue);
+            }
+        }
+    }
+
+    class portOpenCloseButtonAction implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -237,6 +250,7 @@ public class MainFrame extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            /*
             buttonSave.setEnabled(false);
             try {
                 File file = new File("./test.xml");
@@ -249,7 +263,7 @@ public class MainFrame extends JFrame{
                 e1.printStackTrace();
             } finally {
                 buttonSave.setEnabled(true);
-            }
+            }*/
         }
     }
 
@@ -257,6 +271,7 @@ public class MainFrame extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            /*
             buttonOpen.setEnabled(false);
             JAXBContext context = null;
             try {
@@ -280,6 +295,7 @@ public class MainFrame extends JFrame{
             {
                 buttonOpen.setEnabled(true);
             }
+            */
         }
     }
 
@@ -331,7 +347,7 @@ public class MainFrame extends JFrame{
         }
     }
 
-    class inputCaretListener implements CaretListener{
+    class inputCaretListener implements CaretListener {
 
         InputCheckInfo inputCheckInfo;
 
@@ -345,7 +361,7 @@ public class MainFrame extends JFrame{
         }
     }
 
-    class inputFocusListener implements FocusListener{
+    class inputFocusListener implements FocusListener {
 
         InputCheckInfo inputCheckInfo;
 
@@ -363,4 +379,5 @@ public class MainFrame extends JFrame{
             InputCheck.checkLength(inputCheckInfo.textField, inputCheckInfo.minLen, inputCheckInfo.maxLen, buttonSave);
         }
     }
+
 }

@@ -3,6 +3,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Created by apu on 04.11.2016.
@@ -46,11 +47,18 @@ public class AnswerConfiguration extends SwingWorker{
                 for(byte all:dataRes) System.out.println(all);
                 pkt = new PacketUnwrapper().unwrap(dataRes);
             }while(pkt == null);
-            main.mainF.textArea.append(pkt.toString() +"\r\n");
 
             main.port.write("ok");
             //Thread.sleep(100);
-            main.mainF.textArea.append("OK" + "\r\n");
+            publish(new String("OK.\r\n"));
+        }
+    }
+
+    @Override
+    protected void process(List chunks) {
+        super.process(chunks);
+        for(int i=0;i<chunks.size();i++){
+            main.gui.textArea.append(chunks.get(i).toString());
         }
     }
 }

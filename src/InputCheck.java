@@ -12,7 +12,8 @@ public class InputCheck {
             error = true;
         }
         if(error == false){
-            main.config.setGsmServer(text);
+            //main.config.setGsmServer(text);
+            settings.getSet().put(main.param.GSM_SERVER,text);
             textField.setForeground(Color.black);
             saveButton.setEnabled(true);
         }
