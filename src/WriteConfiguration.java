@@ -49,14 +49,21 @@ public class WriteConfiguration extends SwingWorker{
         }
         main.port.comPortDisableListener();
         //main.mainF.buttonPortOpenClose.setEnabled(true);
+        publish(new String("Write OK"));
         return null;
     }
 
     @Override
     protected void process(List chunks) {
         super.process(chunks);
+        String str;
         for(int i=0;i<chunks.size();i++){
-            main.gui.textArea.append(chunks.get(i).toString());
+            str = chunks.get(i).toString();
+            if(str.equals("Write OK")){
+                main.gui.buttonWrite.setEnabled(true);
+                continue;
+            }
+            main.gui.textArea.append(str);
         }
     }
 }

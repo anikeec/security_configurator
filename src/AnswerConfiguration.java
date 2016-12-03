@@ -34,7 +34,7 @@ public class AnswerConfiguration extends SwingWorker{
                 while(main.port.isComPortHasData() == false) {
                     Thread.sleep(10);
                 }*/
-                if(main.port.getInstance().isOpened()) {
+                if(main.port.getPort().isOpened()) {
                     data = main.port.read();
                 }
                 if(data == null)    continue;

@@ -1,4 +1,5 @@
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
@@ -8,10 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -38,7 +36,7 @@ public class GuiFrame extends JFrame{
     private JButton         buttonOpen;
     private JButton         buttonSave;
     private JButton         buttonRead;
-    private JButton         buttonWrite;
+    public JButton          buttonWrite;
     public JButton          buttonPortOpenClose;
     private JComboBox       comboBox;
     private JLabel          labelGsmServer;
@@ -135,7 +133,10 @@ public class GuiFrame extends JFrame{
         buttonRead.addActionListener(new readButtonAction());
         buttonWrite.addActionListener(new writeButtonAction());
         buttonPortOpenClose.addActionListener(new portOpenCloseButtonAction());
-        comboBox.addActionListener(new comboBoxAction());
+        //comboBox.addActionListener(new comboBoxAction());
+        //comboBox.addItemListener(new comboBoxItem());
+
+
         textArea.addPropertyChangeListener(propertyChangeListener);
         inputGsmServer.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmServer)));
         inputGsmServer.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmServer)));
@@ -225,7 +226,12 @@ public class GuiFrame extends JFrame{
                 }
             }
             else{
-                if(main.port.close()) {
+                try {
+                    main.port.close();
+                } catch (SerialPortException e1) {
+                    //e1.printStackTrace();
+                    textArea.append("Error. " + e1.getPortName() + " - " + e1.getExceptionType() + "\r\n");
+                } finally {
                     if(writeConfig != null) writeConfig.cancel(true);
                     if(answerConfig != null) answerConfig.cancel(true);
                     buttonPortOpenClose.setText("Port Open");
@@ -245,7 +251,22 @@ public class GuiFrame extends JFrame{
 
         }
     }
+/*
+    class comboBoxItem implements ItemListener {
 
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            int state = e.getStateChange();
+            if(state == ItemEvent.SELECTED) {
+                comboBox.removeAllItems();
+                String[] strs = SerialPortList.getPortNames();
+                for (String str : strs) {
+                    comboBox.addItem(str);
+                }
+            }
+        }
+    }
+*/
     class saveButtonAction  implements ActionListener{
 
         @Override

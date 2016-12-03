@@ -3,60 +3,61 @@ import jssc.SerialPortException;
 import jssc.SerialPortList;
 import jssc.*;
 
-import javax.swing.*;
-import java.util.EventListener;
-
 /**
  * Created by apu on 06.10.2016.
  */
 public class ComPort {
     public String[] portNames;
-    private SerialPort port = null;
+    private SerialPort comPort = null;
     private SerialPortEventListener portListener;
     private boolean comPortHasData = false;
+    private StringBuilder receiveString = new StringBuilder();
 
-    public void init(){
+    public void portFind(){
         portNames = SerialPortList.getPortNames();
     }
 
-    public SerialPort getInstance(){
-        return port;
+    public SerialPort getPort(){
+        return comPort;
     }
 
     public boolean open(String portNumber) throws SerialPortException {
         if(portNumber == null)  return false;
-        if(port != null)        return false;
-        port = new SerialPort(portNumber);
+        if(comPort != null)        return false;
+        comPort = new SerialPort(portNumber);
         try {
-            port.openPort();
-            port.setParams(SerialPort.BAUDRATE_57600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-            port.setEventsMask(SerialPort.MASK_RXCHAR);
+            comPort.openPort();
+            comPort.setParams(SerialPort.BAUDRATE_57600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            comPort.setEventsMask(SerialPort.MASK_RXCHAR);
             return true;
         } catch (SerialPortException ex){
-            port = null;
+            comPort = null;
             throw ex;
         }
     }
 
-    public boolean close(){
-        if(port == null)    return false;
+    public boolean close() throws SerialPortException {
+        if(comPort == null)    return false;
         try {
-            //byte[] readBuffer = port.readBytes();
+            //byte[] readBuffer = comPort.readBytes();
             if(portListener != null){
-                port.removeEventListener();
+                comPort.removeEventListener();
             }
-            port.closePort();
-            port = null;
+            comPort.closePort();
+            comPort = null;
             return true;
         } catch (SerialPortException e) {
-            e.printStackTrace();
-            return false;
+            comPort = null;
+            portListener = null;
+            //e.printStackTrace();
+            throw new SerialPortException(e.getPortName(),e.getMethodName(),e.getExceptionType());
+            //return false;
         }
     }
 
     public boolean write(String data){
         try {
-            port.writeBytes(data.getBytes());
+            comPort.writeBytes(data.getBytes());
             return true;
         } catch (SerialPortException e) {
             e.printStackTrace();
@@ -66,7 +67,7 @@ public class ComPort {
 
     public boolean write(byte[] data){
         try {
-            port.writeBytes(data);
+            comPort.writeBytes(data);
             return true;
         } catch (SerialPortException e) {
             e.printStackTrace();
@@ -77,7 +78,7 @@ public class ComPort {
     public byte[] read(){
         byte[] readData = new byte[0];
         try {
-            readData = port.readBytes();
+            readData = comPort.readBytes();
         } catch (SerialPortException e) {
             e.printStackTrace();
         }
@@ -88,11 +89,17 @@ public class ComPort {
         byte[] readBuffer;
 
         try {
-            readBuffer = port.readBytes();
+            readBuffer = comPort.readBytes();
             if(readBuffer == null)  return false;
-            if(readBuffer.length<2) return false;
-            if(new String(readBuffer).equals("ok")) return true;
-            else    return false;
+            receiveString.append(new String(readBuffer));
+            if(receiveString.length()<2) return false;
+            if(receiveString.indexOf("ok") != (-1)) {
+                receiveString.delete(0,receiveString.length());
+                return true;
+            }
+            //if(new String(readBuffer).equals("ok")) return true;
+            //else    return false;
+            return false;
         } catch (SerialPortException e) {
             e.printStackTrace();
         }
@@ -103,7 +110,7 @@ public class ComPort {
         portListener = new eventListener(waitBytes);
         setComPortHasData(false);
         try {
-            port.addEventListener(portListener);
+            comPort.addEventListener(portListener);
         } catch (SerialPortException e) {
             e.printStackTrace();
             portListener = null;
@@ -113,7 +120,7 @@ public class ComPort {
 
     public boolean comPortDisableListener(){
         try {
-            port.removeEventListener();
+            comPort.removeEventListener();
             portListener = null;
             setComPortHasData(false);
             return true;

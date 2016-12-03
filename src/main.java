@@ -1,7 +1,3 @@
-import jssc.SerialPortException;
-
-import javax.swing.*;
-
 /**
  * Created by apu on 02.11.2016.
  */
@@ -20,7 +16,7 @@ public class main{
 
     public main() {
         port = new ComPort();
-        port.init();
+        port.portFind();
     }
 
 }
