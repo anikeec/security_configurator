@@ -1,3 +1,5 @@
+import jssc.SerialPortException;
+
 import javax.swing.*;
 import java.util.List;
 
@@ -6,24 +8,29 @@ import java.util.List;
  */
 public class WriteConfiguration extends SwingWorker{
     @Override
-    protected Object doInBackground() throws Exception {
+    protected Object doInBackground() throws InterruptedException, SerialPortException {
 
         byte[] data;
         String message = "";
         PacketWr packet;
-        SwingWorker worker;
 
-        main.port.comPortEnableListener(2);
+        try {
+            main.port.comPortEnableListener(2);
+        } catch (SerialPortException e) {
+            publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+            publish(new String("Write OK"));//to enable write button
+            throw e;
+        }
 
         for(int ptr=0;ptr<2;ptr++) {
             switch(ptr){
                 case 0:
                         data = settings.getSet().get(main.param.GSM_SERVER).getBytes();
-                        message = "Gsm Server write done.";
+                        message = "Write. Send request. Gsm Server. ";
                         break;
                 case 1:
                         data = settings.getSet().get(main.param.GSM_MONEY_QUERY).getBytes();
-                        message = "Gsm Money Query write done.";
+                        message = "Write. Send request. Gsm Money Query.";
                         break;
                 default:
                         data = new byte[]{0};
@@ -31,25 +38,42 @@ public class WriteConfiguration extends SwingWorker{
             }
 
             packet = new PacketWrapper().wrap(ptr, ConfigCommand.COMMAND_WRITE, data);
-            main.port.write(packet.data);
-            main.port.setComPortHasData(false);
-            for(int i=0;i<100;i++) {
-                Thread.sleep(300);
-                if(main.port.isComPortHasData() == true)
-                {
-                    if(main.port.waitOk()) {
-                        publish(new String("OK.\r\n"));
-                        break;
+            try {
+                main.port.write(packet.data);
+                main.port.setComPortHasData(false);
+                publish(new String(message + "\r\n"));
+                message = "Error. No answer.";
+                for(int i=0;i<100;i++) {
+                    Thread.sleep(30);
+                    if(main.port.isComPortHasData() == true)
+                    {
+                        if(main.port.waitOk()) {
+                            message = "OK";
+                            break;
+                        }
                     }
                 }
+                Thread.sleep(200);
+                publish(new String(message + "\r\n"));
+                if(message.equals("OK") == false)   break;
+            } catch (SerialPortException e){
+                publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+                publish(new String("Write OK"));
+                throw e;
+            } catch (InterruptedException e) {
+                publish("Error. Timeout.");
+                publish(new String("Write OK"));
+                throw e;
             }
-
-            Thread.sleep(200);
-            publish(new String(message + "\r\n"));
         }
-        main.port.comPortDisableListener();
-        //main.mainF.buttonPortOpenClose.setEnabled(true);
-        publish(new String("Write OK"));
+        try {
+            main.port.comPortDisableListener();
+        } catch (SerialPortException e) {
+            publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+            throw e;
+        } finally {
+            publish(new String("Write OK"));
+        }
         return null;
     }
 

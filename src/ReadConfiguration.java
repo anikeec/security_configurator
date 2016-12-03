@@ -1,3 +1,5 @@
+import jssc.SerialPortException;
+
 import javax.swing.*;
 import java.util.List;
 
@@ -6,22 +8,21 @@ import java.util.List;
  */
 public class ReadConfiguration extends SwingWorker{
     @Override
-    protected Object doInBackground() throws Exception {
+    protected Object doInBackground() throws SerialPortException, InterruptedException {
 
         byte[] data;
         String message = "";
         PacketWr packet;
-        SwingWorker worker;
 
         for(int ptr=0;ptr<2;ptr++) {
             switch(ptr){
                 case 0:
                         data = settings.getSet().get(main.param.GSM_SERVER).getBytes();
-                        message = "Gsm Server write done.";
+                        message = "Read. Send request. Gsm Server.";
                         break;
                 case 1:
                         data = settings.getSet().get(main.param.GSM_MONEY_QUERY).getBytes();
-                        message = "Gsm Money Query write done.";
+                        message = "Read. Send request. Gsm Money Query.";
                         break;
                 default:
                         data = new byte[]{0};
@@ -29,21 +30,30 @@ public class ReadConfiguration extends SwingWorker{
             }
 
             packet = new PacketWrapper().wrap(ptr, ConfigCommand.COMMAND_READ, data);
-            main.port.write(packet.data);
-            for(int i=0;i<100;i++) {
-                Thread.sleep(300);
-                if(main.port.waitOk() == true)
-                {
-                    publish(new String("OK.\r\n"));
-                    break;
-
-                } else {
-                    publish(new String("NOK.\r\n"));
+            try {
+                main.port.write(packet.data);
+                publish(new String(message + "\r\n"));
+                message = "Error. No answer.";
+                for(int i=0;i<100;i++) {
+                    Thread.sleep(30);
+                    if(main.port.waitOk() == true)
+                    {
+                        message = "OK";
+                        break;
+                    }
                 }
+                Thread.sleep(100);
+                publish(new String(message + "\r\n"));
+            } catch (SerialPortException e) {
+                publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+                publish(new String("Write OK"));
+                throw e;
+            } catch (InterruptedException e) {
+                publish("Error. Timeout.");
+                publish(new String("Write OK"));
+                throw e;
             }
 
-            Thread.sleep(100);
-            publish(new String(message + "\r\n"));
         }
         return null;
     }

@@ -222,14 +222,13 @@ public class GuiFrame extends JFrame{
                         textArea.append("Port " + item + " open.\r\n");
                     }
                 } catch (SerialPortException ex){
-                    textArea.append(ex.getPortName() + " " + ex.getExceptionType() + "\r\n");
+                    textArea.append("Error. " + ex.getPortName() + " - " + ex.getExceptionType() + "\r\n");
                 }
             }
             else{
                 try {
                     main.port.close();
                 } catch (SerialPortException e1) {
-                    //e1.printStackTrace();
                     textArea.append("Error. " + e1.getPortName() + " - " + e1.getExceptionType() + "\r\n");
                 } finally {
                     if(writeConfig != null) writeConfig.cancel(true);
@@ -326,12 +325,8 @@ public class GuiFrame extends JFrame{
         public void actionPerformed(ActionEvent e) {
             buttonWrite.setEnabled(false);
             buttonRead.setEnabled(false);
-            //buttonPortOpenClose.setEnabled(false);
             writeConfig = new WriteConfiguration();
             writeConfig.execute();
-
-            //buttonWrite.setEnabled(true);
-            //buttonRead.setEnabled(true);
         }
     }
 

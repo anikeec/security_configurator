@@ -1,7 +1,7 @@
+import jssc.SerialPortException;
+
 import javax.swing.*;
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class AnswerConfiguration extends SwingWorker{
     @Override
-    protected Object doInBackground() throws Exception {
+    protected Object doInBackground() throws IOException, SerialPortException {
 
         byte[] data;
         byte[] dataRes;
@@ -20,27 +20,37 @@ public class AnswerConfiguration extends SwingWorker{
 
         //main.port.comPortEnableListener(1);
 
-        FileOutputStream fos = new FileOutputStream("log.txt");
-        PrintStream prn = new PrintStream(fos);
-        System.setOut(prn);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream("log.txt");
+            PrintStream prn = new PrintStream(fos);
+            System.setOut(prn);
+        } catch (FileNotFoundException e) {
+            publish("Error. Logging error. " + e.getMessage() + "\r\n");
+        }
 
         while(true) {
             data = null;
             baos.reset();
             pkt = null;
             do {
-                /*
-                main.port.setComPortHasData(false);
-                while(main.port.isComPortHasData() == false) {
-                    Thread.sleep(10);
-                }*/
                 if(main.port.getPort().isOpened()) {
-                    data = main.port.read();
+                    try {
+                        data = main.port.read();
+                    } catch (SerialPortException e) {
+                        publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+                        throw e;
+                    }
                 }
                 if(data == null)    continue;
                 System.out.println("read");
                 if(data != null){
-                    baos.write(data);
+                    try {
+                        baos.write(data);
+                    } catch (IOException e) {
+                        publish("Error. " + e.getMessage() + "\r\n");
+                        throw e;
+                    }
                 }
                 if(baos.size() < 8)   continue;
                 dataRes = baos.toByteArray();
@@ -48,7 +58,12 @@ public class AnswerConfiguration extends SwingWorker{
                 pkt = new PacketUnwrapper().unwrap(dataRes);
             }while(pkt == null);
 
-            main.port.write("ok");
+            try {
+                main.port.write("ok");
+            } catch (SerialPortException e) {
+                publish("Error. " + e.getMessage() + "\r\n");
+                throw e;
+            }
             //Thread.sleep(100);
             publish(new String("OK.\r\n"));
         }
