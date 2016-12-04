@@ -5,9 +5,12 @@ import java.util.Map;
  * Created by apu on 02.12.2016.
  */
 public class settings {
-    private static Map<main.param,String> map;
+    private static Map<String,String> map;
 
-    public static Map<main.param, String> getSet() {
+    public static final int GSM_SERVER = 0;
+    public static final int GSM_MONEY_QUERY = 1;
+
+    public static Map<String, String> getSet() {
         if(map == null){
             init();
         }
@@ -15,11 +18,11 @@ public class settings {
     }
 
     private static void init(){
-        map = new HashMap<main.param,String>();
+        map = new HashMap<String,String>();
 
-        map.put(main.param.GSM_SERVER,"www.kyivstar.net");
-        map.put(main.param.GSM_MONEY_QUERY,"*111#");
-        map.put(main.param.GPRS_SERVER,"primula.net.ua");
-        map.put(main.param.GPRS_PORT,"80");
+        map.put(pktParams.GSM_SERVER,"www.kyivstar.net");
+        map.put(pktParams.GSM_MONEY_QUERY,"*111#");
+        map.put(pktParams.GPRS_SERVER,"primula.net.ua");
+        map.put(pktParams.GPRS_PORT,"80");
     }
 }

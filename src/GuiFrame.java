@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class GuiFrame extends JFrame{
 
-    private Map<main.param,Object> map;
+    private Map<String,Object> map;
 
     private WriteConfiguration  writeConfig;
     private AnswerConfiguration answerConfig;
@@ -57,14 +57,18 @@ public class GuiFrame extends JFrame{
 
     private ChangeListener  propertyChangeListener;
 
-    public Map<main.param, Object> getGui() {
+    public Map<String, Object> getGui() {
         return map;
+    }
+
+    public void inputSetText(JTextField field, String text){
+        field.setText(text);
     }
 
     public GuiFrame(){
         //super();
 
-        map = new HashMap<main.param,Object>();
+        map = new HashMap<String,Object>();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600, 700);
@@ -95,10 +99,10 @@ public class GuiFrame extends JFrame{
         inputGprsTimeout = new LimitTextField();
         panelCenter = new JPanel();
 
-        map.put(main.param.GSM_SERVER,inputGsmServer);
-        map.put(main.param.GSM_MONEY_QUERY,inputGsmMoneyQuery);
-        map.put(main.param.GPRS_SERVER,inputGprsServer);
-        map.put(main.param.GPRS_PORT,inputGprsPort);
+        map.put(pktParams.GSM_SERVER,inputGsmServer);
+        map.put(pktParams.GSM_MONEY_QUERY,inputGsmMoneyQuery);
+        map.put(pktParams.GPRS_SERVER,inputGprsServer);
+        map.put(pktParams.GPRS_PORT,inputGprsPort);
 
         buttonOpen.setText("Open File");
         buttonSave.setText("Save File");
@@ -106,13 +110,13 @@ public class GuiFrame extends JFrame{
         buttonWrite.setText("Write Data");
         buttonPortOpenClose.setText("Port Open");
         labelGsmServer.setText("GSM server address (www.kyivstar.net):  ");
-        inputGsmServer.setText(settings.getSet().get(main.param.GSM_SERVER));
+        inputGsmServer.setText(settings.getSet().get(pktParams.GSM_SERVER));
         labelGsmMoneyQuery.setText("GSM check money query (*111#):  ");
-        inputGsmMoneyQuery.setText(settings.getSet().get(main.param.GSM_MONEY_QUERY));
+        inputGsmMoneyQuery.setText(settings.getSet().get(pktParams.GSM_MONEY_QUERY));
         labelGprsServer.setText("GPRS server address:  ");
-        inputGprsServer.setText(settings.getSet().get(main.param.GPRS_SERVER));
+        inputGprsServer.setText(settings.getSet().get(pktParams.GPRS_SERVER));
         labelGprsPort.setText("GPRS port number:  ");
-        inputGprsPort.setText(settings.getSet().get(main.param.GPRS_PORT));
+        inputGprsPort.setText(settings.getSet().get(pktParams.GPRS_PORT));
         labelGprsTimeout.setText("GPRS update timeout(seconds):  ");
         inputGprsTimeout.setText("0");
 

@@ -6,20 +6,33 @@ import java.nio.ByteOrder;
  */
 public class PacketUnwrapper {
 
-    private final int PACKET_PTR_COMMAND = 0;
-    private final int PACKET_PTR_COMMAND_LEN = 2;
-    private final int PACKET_PTR_NUMBER = 2;
-    private final int PACKET_PTR_NUMBER_LEN = 2;
-    private final int PACKET_PTR_LENGTH = 4;
-    private final int PACKET_PTR_LENGTH_LEN = 2;
-    private final int PACKET_PTR_DATA = 6;
-    private final int PACKET_PTR_CRC16_LEN = 2;
+    private static final int PACKET_PTR_COMMAND = 0;
+    private static final int PACKET_PTR_COMMAND_LEN = 2;
+    private static final int PACKET_PTR_NUMBER = 2;
+    private static final int PACKET_PTR_NUMBER_LEN = 2;
+    private static final int PACKET_PTR_LENGTH = 4;
+    private static final int PACKET_PTR_LENGTH_LEN = 2;
+    private static final int PACKET_PTR_DATA = 6;
+    private static final int PACKET_PTR_CRC16_LEN = 2;
+    public  static final int PACKET_HEADER_LENGTH = 6;
+    public  static final int PACKET_LENGTH_MAX = 100;
 
     private short    packetCommand;
     private short    packetNumber;
     private short    packetLength;
     private short    packetCrc16;
     private byte[]   packetData;
+
+    public short packetLength(byte[] src){
+        byte[] bytesTemp = new byte[2];
+        short packetLength;
+
+        if(src.length < (PACKET_PTR_DATA)) return -1;
+        for(int i=0;i<PACKET_PTR_LENGTH_LEN;i++)   bytesTemp[i] = src[PACKET_PTR_LENGTH + i];
+        packetLength = bytesToShort(bytesTemp);
+        if(packetLength > PACKET_LENGTH_MAX)  packetLength = -1;
+        return packetLength;
+    }
 
     public PacketUnwr unwrap(byte[] src){
 

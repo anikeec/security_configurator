@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
+import java.util.Map;
 
 public class InputCheck {
     public static boolean checkLength(JTextField textField, int minLen, int maxLen, JButton saveButton){
@@ -13,7 +15,20 @@ public class InputCheck {
         }
         if(error == false){
             //main.config.setGsmServer(text);
-            settings.getSet().put(main.param.GSM_SERVER,text);
+            String key = "";
+            Map<String,Object> map = main.gui.getGui();
+            Iterator<Map.Entry<String,Object>> it = map.entrySet().iterator();
+            Map.Entry<String,Object> entry;
+            while(it.hasNext()){
+                entry = it.next();
+                if(entry.getValue() == textField){
+                    key = entry.getKey();
+                    break;
+                }
+            }
+            if(key != "") {
+                settings.getSet().put(key, text);
+            }
             textField.setForeground(Color.black);
             saveButton.setEnabled(true);
         }

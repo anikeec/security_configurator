@@ -17,11 +17,11 @@ public class ReadConfiguration extends SwingWorker{
         for(int ptr=0;ptr<2;ptr++) {
             switch(ptr){
                 case 0:
-                        data = settings.getSet().get(main.param.GSM_SERVER).getBytes();
+                        data = settings.getSet().get(pktParams.GSM_SERVER).getBytes();
                         message = "Read. Send request. Gsm Server.";
                         break;
                 case 1:
-                        data = settings.getSet().get(main.param.GSM_MONEY_QUERY).getBytes();
+                        data = settings.getSet().get(pktParams.GSM_MONEY_QUERY).getBytes();
                         message = "Read. Send request. Gsm Money Query.";
                         break;
                 default:

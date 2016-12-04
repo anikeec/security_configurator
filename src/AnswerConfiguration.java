@@ -17,6 +17,7 @@ public class AnswerConfiguration extends SwingWorker{
         byte[] dataRes;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PacketUnwr pkt = null;
+        String[] strs = new String[2];
 
         //main.port.comPortEnableListener(1);
 
@@ -34,30 +35,35 @@ public class AnswerConfiguration extends SwingWorker{
             baos.reset();
             pkt = null;
             do {
-                if(main.port.getPort().isOpened()) {
-                    try {
-                        data = main.port.read();
-                    } catch (SerialPortException e) {
-                        publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
-                        throw e;
-                    }
+                data = receiveBytes(PacketUnwrapper.PACKET_HEADER_LENGTH);
+                short length = new PacketUnwrapper().packetLength(data);
+                if(length == -1){
+
                 }
-                if(data == null)    continue;
-                System.out.println("read");
-                if(data != null){
-                    try {
-                        baos.write(data);
-                    } catch (IOException e) {
-                        publish("Error. " + e.getMessage() + "\r\n");
-                        throw e;
-                    }
-                }
-                if(baos.size() < 8)   continue;
+                baos.write(data);
+                data = receiveBytes(length - (data.length - PacketUnwrapper.PACKET_HEADER_LENGTH));
+                baos.write(data);
                 dataRes = baos.toByteArray();
                 for(byte all:dataRes) System.out.println(all);
                 pkt = new PacketUnwrapper().unwrap(dataRes);
+                strs[0] = "";
+                strs[1] = "";
+                switch(pkt.getPacketNumber()){
+                    case settings.GSM_SERVER:
+                                                strs[0] = pktParams.GSM_SERVER;
+                                                strs[1] = new String(pkt.getPacketData());
+                                                break;
+                    case settings.GSM_MONEY_QUERY:
+                                                strs[0] = pktParams.GSM_MONEY_QUERY;
+                                                strs[1] = new String(pkt.getPacketData());
+                                                break;
+                    default:
+                                                strs[0] = "";
+                                                strs[1] = "";
+                                                break;
+                }
             }while(pkt == null);
-
+            publish(strs);
             try {
                 main.port.write("ok");
             } catch (SerialPortException e) {
@@ -69,11 +75,47 @@ public class AnswerConfiguration extends SwingWorker{
         }
     }
 
+    private byte[] receiveBytes(int length) throws SerialPortException, IOException {
+        byte[] data;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        data = null;
+        baos.reset();
+        do {
+            if(main.port.getPort().isOpened()) {
+                try {
+                    data = main.port.read();
+                } catch (SerialPortException e) {
+                    publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
+                    throw e;
+                }
+            }
+            if(data == null)    continue;
+            System.out.println("read");
+            if(data != null){
+                try {
+                    baos.write(data);
+                } catch (IOException e) {
+                    publish("Error. " + e.getMessage() + "\r\n");
+                    throw e;
+                }
+            }
+        } while(baos.size() < length);
+        return baos.toByteArray();
+    }
+
     @Override
     protected void process(List chunks) {
         super.process(chunks);
-        for(int i=0;i<chunks.size();i++){
-            main.gui.textArea.append(chunks.get(i).toString());
+        if(chunks.size() == 3){
+            String key = chunks.get(0).toString();
+            Object obj = main.gui.getGui().get(key);
+            String text = chunks.get(1).toString();
+            main.gui.inputSetText((JTextField)obj,text);
+            main.gui.textArea.append(chunks.get(2).toString());
+        } else {
+            for (int i = 0; i < chunks.size(); i++) {
+                main.gui.textArea.append(chunks.get(i).toString());
+            }
         }
     }
 }
