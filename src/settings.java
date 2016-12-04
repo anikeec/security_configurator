@@ -7,8 +7,8 @@ import java.util.Map;
 public class settings {
     private static Map<String,String> map;
 
-    public static final int GSM_SERVER = 0;
-    public static final int GSM_MONEY_QUERY = 1;
+    public static final int N_GSM_SERVER = 0;
+    public static final int N_GSM_MONEY_QUERY = 1;
 
     public static Map<String, String> getSet() {
         if(map == null){

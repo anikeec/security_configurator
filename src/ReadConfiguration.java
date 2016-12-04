@@ -15,14 +15,15 @@ public class ReadConfiguration extends SwingWorker{
         PacketWr packet;
 
         for(int ptr=0;ptr<2;ptr++) {
+            message = "Read. Send request. ";
             switch(ptr){
-                case 0:
+                case settings.N_GSM_SERVER:
                         data = settings.getSet().get(pktParams.GSM_SERVER).getBytes();
-                        message = "Read. Send request. Gsm Server.";
+                        message += pktParams.GSM_SERVER;
                         break;
-                case 1:
+                case settings.N_GSM_MONEY_QUERY:
                         data = settings.getSet().get(pktParams.GSM_MONEY_QUERY).getBytes();
-                        message = "Read. Send request. Gsm Money Query.";
+                        message += pktParams.GSM_MONEY_QUERY;
                         break;
                 default:
                         data = new byte[]{0};

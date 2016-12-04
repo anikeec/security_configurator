@@ -23,14 +23,15 @@ public class WriteConfiguration extends SwingWorker{
         }
 
         for(int ptr=0;ptr<2;ptr++) {
+            message = "Write. Send request. ";
             switch(ptr){
-                case settings.GSM_SERVER:
+                case settings.N_GSM_SERVER:
                         data = settings.getSet().get(pktParams.GSM_SERVER).getBytes();
-                        message = "Write. Send request. Gsm Server. ";
+                        message += pktParams.GSM_SERVER;
                         break;
-                case settings.GSM_MONEY_QUERY:
+                case settings.N_GSM_MONEY_QUERY:
                         data = settings.getSet().get(pktParams.GSM_MONEY_QUERY).getBytes();
-                        message = "Write. Send request. Gsm Money Query.";
+                        message += pktParams.GSM_MONEY_QUERY;
                         break;
                 default:
                         data = new byte[]{0};

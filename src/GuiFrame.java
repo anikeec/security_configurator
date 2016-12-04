@@ -1,5 +1,4 @@
 import jssc.SerialPortException;
-import jssc.SerialPortList;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;

@@ -2,7 +2,6 @@ import jssc.SerialPortException;
 
 import javax.swing.*;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -49,11 +48,11 @@ public class AnswerConfiguration extends SwingWorker{
                 strs[0] = "";
                 strs[1] = "";
                 switch(pkt.getPacketNumber()){
-                    case settings.GSM_SERVER:
+                    case settings.N_GSM_SERVER:
                                                 strs[0] = pktParams.GSM_SERVER;
                                                 strs[1] = new String(pkt.getPacketData());
                                                 break;
-                    case settings.GSM_MONEY_QUERY:
+                    case settings.N_GSM_MONEY_QUERY:
                                                 strs[0] = pktParams.GSM_MONEY_QUERY;
                                                 strs[1] = new String(pkt.getPacketData());
                                                 break;
