@@ -43,11 +43,7 @@ public class AnswerConfiguration extends SwingWorker{
                     continue;
                 }
                 baos.write(data);
-                data = receiveBytes(length +
-                                    PacketUnwrapper.PACKET_HEADER_LENGTH +
-                                    PacketUnwrapper.PACKET_PTR_COMMAND_LEN +
-                                    PacketUnwrapper.PACKET_PTR_NUMBER_LEN -
-                                    data.length);
+                data = receiveBytes(length  - data.length);
                 baos.write(data);
                 dataRes = baos.toByteArray();
                 for(byte all:dataRes) System.out.println(all);

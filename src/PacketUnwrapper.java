@@ -28,7 +28,7 @@ public class PacketUnwrapper {
     private byte     packetAddress;
     private byte     packetLength;
     private byte     packetCrc8;
-    private short    packetCommand;
+    private byte     packetCommand;
     private short    packetNumber;
     private short    packetCrc16;
     private byte[]   packetData;
@@ -71,6 +71,7 @@ public class PacketUnwrapper {
     public PacketUnwr unwrap(byte[] src){
 
         byte[] bytesTemp = new byte[2];
+        int lengthPktData = 0;
 
         if(src.length < (PACKET_HEADER_LENGTH)) return null;
 
@@ -80,6 +81,8 @@ public class PacketUnwrapper {
 
         packetLength = src[PACKET_PTR_LENGTH];
 
+        if(src.length < packetLength) return null;  // check received packet length
+
         packetCrc8 = src[PACKET_PTR_CRC8];
 
         packetCommand = src[PACKET_PTR_COMMAND];
@@ -87,17 +90,30 @@ public class PacketUnwrapper {
         for(int i=0;i<PACKET_PTR_NUMBER_LEN;i++)   bytesTemp[i] = src[PACKET_PTR_NUMBER + i];
         packetNumber = bytesToShort(bytesTemp);
 
-        if(src.length < (PACKET_PTR_COMMAND_LEN + PACKET_PTR_NUMBER_LEN + PACKET_HEADER_LENGTH + packetLength)) return null;
+        lengthPktData = packetLength -
+                        PACKET_HEADER_LENGTH -
+                        PACKET_PTR_COMMAND_LEN -
+                        PACKET_PTR_NUMBER_LEN -
+                        PACKET_PTR_CRC16_LEN;
 
-        packetData = new byte[packetLength - PACKET_PTR_CRC16_LEN];
-        for(int i=0;i<(packetLength - PACKET_PTR_CRC16_LEN);i++)   packetData[i] = src[PACKET_PTR_DATA + i];
+        packetData = new byte[lengthPktData];
+        for(int i=0;i<(lengthPktData);i++)   packetData[i] = src[PACKET_PTR_DATA + i];
 
         for(int i=0;i<PACKET_PTR_CRC16_LEN;i++){
-            bytesTemp[i] = src[PACKET_PTR_DATA + packetLength - PACKET_PTR_CRC16_LEN + i];
+            bytesTemp[i] = src[packetLength - PACKET_PTR_CRC16_LEN + i];
         }
         packetCrc16 = bytesToShort(bytesTemp);
 
-        if(packetCrc16 != (short)Crc16.countCrc16(packetData))  return null;
+        ByteBuffer bbPacket = ByteBuffer.allocate(packetLength - PACKET_PTR_CRC16_LEN);
+        bbPacket.put(packetMagicByte);
+        bbPacket.put(packetAddress);
+        bbPacket.put(packetLength);
+        bbPacket.put(packetCrc8);
+        bbPacket.put(packetCommand);
+        bbPacket.putShort(packetNumber);
+        bbPacket.put(packetData);
+
+        if(packetCrc16 != (short)Crc16.countCrc16(bbPacket.array()))  return null;    // check crc16
 
         PacketUnwr res = new PacketUnwr();
 

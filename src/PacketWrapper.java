@@ -10,31 +10,44 @@ public class PacketWrapper {
     public PacketWr wrap(byte pktAddress, int pkrNumber, byte pktCommand, byte[] src){
         ByteBuffer bbHeader = ByteBuffer.wrap(new byte[3]);
         Crc8 crc8 = new Crc8();
+        short lengthPktFull = 0;
 
         PacketRes resTemp = new PacketRes();
-        PacketWr res = new PacketWr(resTemp.getPacketMagicByte().length +
-                                    resTemp.getPacketAddressByte().length +
-                                    resTemp.getPacketLengthByte().length +
-                                    resTemp.getPacketCrc8Byte().length +
-                                    resTemp.getPacketCommandByte().length +
-                                    resTemp.getPacketNumberByte().length +
-                                    src.length +
-                                    resTemp.getPacketCrc16Byte().length);
+
+        lengthPktFull = (short)(resTemp.getPacketMagicByte().length +
+                                resTemp.getPacketAddressByte().length +
+                                resTemp.getPacketLengthByte().length +
+                                resTemp.getPacketCrc8Byte().length +
+                                resTemp.getPacketCommandByte().length +
+                                resTemp.getPacketNumberByte().length +
+                                src.length +
+                                resTemp.getPacketCrc16Byte().length);
+
+        PacketWr res = new PacketWr(lengthPktFull);
 
         resTemp.packetAddress = pktAddress;
-        resTemp.packetLength = (byte)(src.length + resTemp.getPacketCrc16Byte().length);
+        resTemp.packetLength = (byte)(lengthPktFull);
         resTemp.packetCommand = pktCommand;
         resTemp.packetNumber = (short)pkrNumber;
-        resTemp.packetCrc16  = (short) Crc16.countCrc16(src);
 
-        //bbHeader.reset();
-        bbHeader.put(resTemp.packetMagicByte);
+        bbHeader.put(resTemp.packetMagicByte);      // make header array for count crc8
         bbHeader.put(resTemp.packetAddress);
         bbHeader.put(resTemp.packetLength);
 
         resTemp.packetCrc8 = crc8.calc(bbHeader.array());
 
-        int ptr = 0;
+        bbHeader = ByteBuffer.allocate(lengthPktFull - resTemp.getPacketCrc16Byte().length);
+        bbHeader.put(resTemp.packetMagicByte);      // make array for count crc16
+        bbHeader.put(resTemp.packetAddress);
+        bbHeader.put(resTemp.packetLength);
+        bbHeader.put(resTemp.packetCrc8);
+        bbHeader.put(resTemp.packetCommand);
+        bbHeader.putShort(resTemp.packetNumber);
+        bbHeader.put(src);
+
+        resTemp.packetCrc16  = (short) Crc16.countCrc16(bbHeader.array());
+
+        int ptr = 0;                                // create result array
         res.data[ptr++] = resTemp.getPacketMagicByte()[0];
 
         res.data[ptr++] = resTemp.getPacketAddressByte()[0];
@@ -43,9 +56,8 @@ public class PacketWrapper {
 
         res.data[ptr++] = resTemp.getPacketCrc8Byte()[0];
 
-        for(int i=0;i<resTemp.getPacketCommandByte().length;i++) {
-            res.data[ptr++] = resTemp.getPacketCommandByte()[i];
-        }
+        res.data[ptr++] = resTemp.getPacketCommandByte()[0];
+
         for(int i=0;i<resTemp.getPacketNumberByte().length;i++) {
             res.data[ptr++] = resTemp.getPacketNumberByte()[i];
         }
@@ -75,7 +87,6 @@ public class PacketWrapper {
         public byte     packetAddress;
         public byte     packetLength;
         public byte     packetCrc8;
-
         public byte     packetCommand;
         public short    packetNumber;
         public short    packetCrc16;
