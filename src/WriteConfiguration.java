@@ -38,7 +38,7 @@ public class WriteConfiguration extends SwingWorker{
                         message = "Error.";
             }
 
-            packet = new PacketWrapper().wrap(ptr, ConfigCommand.COMMAND_WRITE, data);
+            packet = new PacketWrapper().wrap((byte)0, ptr, ConfigCommand.COMMAND_WRITE, data);
             try {
                 main.port.write(packet.data);
                 main.port.setComPortHasData(false);

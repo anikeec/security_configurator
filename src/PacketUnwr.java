@@ -2,18 +2,36 @@
  * Created by apu on 04.11.2016.
  */
 public class PacketUnwr {
+    private byte     packetMagicByte;
+    private byte     packetAddress;
+    private byte     packetLength;
+    private byte     packetCrc8;
     private short    packetCommand;
     private short    packetNumber;
-    private short    packetLength;
     private short    packetCrc16;
     private byte[]   packetData;
 
     public PacketUnwr() {
+        packetMagicByte = 0;
+        packetAddress = 0;
+        packetLength = 0;
+        packetCrc8 = 0;
         packetCommand = 0;
         packetNumber = 0;
-        packetLength = 0;
         packetCrc16 = 0;
         packetData = null;
+    }
+
+    public byte getPacketMagicByte() {
+        return packetMagicByte;
+    }
+
+    public byte getPacketAddress() {
+        return packetAddress;
+    }
+
+    public byte getPacketCrc8() {
+        return packetCrc8;
     }
 
     public short getPacketCommand(){
@@ -24,7 +42,7 @@ public class PacketUnwr {
         return packetNumber;
     }
 
-    public short getPacketLength(){
+    public byte getPacketLength(){
         return packetLength;
     }
 
@@ -36,6 +54,18 @@ public class PacketUnwr {
         return packetData;
     }
 
+    public void setPacketMagicByte(byte packetMagicByte) {
+        this.packetMagicByte = packetMagicByte;
+    }
+
+    public void setPacketAddress(byte packetAddress) {
+        this.packetAddress = packetAddress;
+    }
+
+    public void setPacketCrc8(byte packetCrc8) {
+        this.packetCrc8 = packetCrc8;
+    }
+
     public void setPacketCommand(short packetCommand) {
         this.packetCommand = packetCommand;
     }
@@ -44,7 +74,7 @@ public class PacketUnwr {
         this.packetNumber = packetNumber;
     }
 
-    public void setPacketLength(short packetLength) {
+    public void setPacketLength(byte packetLength) {
         this.packetLength = packetLength;
     }
 

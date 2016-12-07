@@ -30,7 +30,7 @@ public class ReadConfiguration extends SwingWorker{
                         message = "Error.";
             }
 
-            packet = new PacketWrapper().wrap(ptr, ConfigCommand.COMMAND_READ, data);
+            packet = new PacketWrapper().wrap((byte)0, ptr, ConfigCommand.COMMAND_READ, data);
             try {
                 main.port.write(packet.data);
                 publish(new String(message + "\r\n"));

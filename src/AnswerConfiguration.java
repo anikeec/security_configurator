@@ -37,14 +37,24 @@ public class AnswerConfiguration extends SwingWorker{
                 data = receiveBytes(PacketUnwrapper.PACKET_HEADER_LENGTH);
                 short length = new PacketUnwrapper().packetLength(data);
                 if(length == -1){
-
+                    data = null;
+                    baos.reset();
+                    pkt = null;
+                    continue;
                 }
                 baos.write(data);
-                data = receiveBytes(length - (data.length - PacketUnwrapper.PACKET_HEADER_LENGTH));
+                data = receiveBytes(length +
+                                    PacketUnwrapper.PACKET_HEADER_LENGTH +
+                                    PacketUnwrapper.PACKET_PTR_COMMAND_LEN +
+                                    PacketUnwrapper.PACKET_PTR_NUMBER_LEN -
+                                    data.length);
                 baos.write(data);
                 dataRes = baos.toByteArray();
                 for(byte all:dataRes) System.out.println(all);
                 pkt = new PacketUnwrapper().unwrap(dataRes);
+                if(pkt == null){
+                    System.out.print(1);
+                }
                 strs[0] = "";
                 strs[1] = "";
                 switch(pkt.getPacketNumber()){
@@ -63,6 +73,9 @@ public class AnswerConfiguration extends SwingWorker{
                 }
             }while(pkt == null);
             publish(strs);
+            while(main.port.isComPortHasData() == true){
+                receiveBytes(1);
+            }
             try {
                 main.port.write("ok");
             } catch (SerialPortException e) {
