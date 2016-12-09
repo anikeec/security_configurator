@@ -45,7 +45,7 @@ public class PacketWrapper {
         bbHeader.putShort(resTemp.packetNumber);
         bbHeader.put(src);
 
-        resTemp.packetCrc16  = (short) Crc16.countCrc16(bbHeader.array());
+        resTemp.packetCrc16  = (short) Crc16.calc(bbHeader.array());
 
         int ptr = 0;                                // create result array
         res.data[ptr++] = resTemp.getPacketMagicByte()[0];

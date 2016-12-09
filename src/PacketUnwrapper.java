@@ -1,5 +1,4 @@
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /**
  * Created by apu on 04.11.2016.
@@ -113,7 +112,7 @@ public class PacketUnwrapper {
         bbPacket.putShort(packetNumber);
         bbPacket.put(packetData);
 
-        if(packetCrc16 != (short)Crc16.countCrc16(bbPacket.array()))  return null;    // check crc16
+        if(packetCrc16 != (short)Crc16.calc(bbPacket.array()))  return null;    // check crc16
 
         PacketUnwr res = new PacketUnwr();
 
