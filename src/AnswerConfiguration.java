@@ -15,8 +15,19 @@ public class AnswerConfiguration extends SwingWorker{
         byte[] data;
         byte[] dataRes;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PacketUnwr pkt = null;
+        //PacketUnwr pkt = null;
         String[] strs = new String[2];
+
+        InnerPacket innerPacketToSend;
+        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
+        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
+
+        OuterPacket outerPacketToSend;
+        OuterProtocol packetOuterProtocol = new OuterProtocol(1, 1, 1, 1, 2);
+        OuterWrapper packetOuterWrapper = new OuterWrapper(packetOuterProtocol);
+
+        OuterPacket inputUnwrapOuterPacket = null;
+        InnerPacket inputUnwrapInnerPacket = null;
 
         //main.port.comPortEnableListener(1);
 
@@ -32,43 +43,66 @@ public class AnswerConfiguration extends SwingWorker{
         while(true) {
             data = null;
             baos.reset();
-            pkt = null;
+            //pkt = null;
+            inputUnwrapInnerPacket = null;
             do {
-                data = receiveBytes(PacketUnwrapper.PACKET_HEADER_LENGTH);
-                short length = new PacketUnwrapper().packetLength(data);
+                System.out.println("start receive header");
+                data = receiveBytes(packetOuterProtocol.getHeaderLen());//PacketUnwrapper.PACKET_HEADER_LENGTH
+                int length = -1;
+                try {
+                    length = packetOuterWrapper.unwrapHeaderLength(data);
+                } catch (WrapperException e) {
+                    System.out.println(e.getMessage());
+                }
+                //new PacketUnwrapper().packetLength(data);
                 if(length == -1){
                     data = null;
                     baos.reset();
-                    pkt = null;
+                    //pkt = null;
+                    inputUnwrapInnerPacket = null;
                     continue;
                 }
                 baos.write(data);
+                System.out.println("receive " + data.length + " bytes");
+                System.out.println("receive other " + (length  - data.length) + " bytes");
                 data = receiveBytes(length  - data.length);
                 baos.write(data);
                 dataRes = baos.toByteArray();
                 for(byte all:dataRes) System.out.println(all);
-                pkt = new PacketUnwrapper().unwrap(dataRes);
-                if(pkt == null){
-                    System.out.print(1);
+
+                inputUnwrapOuterPacket = null;
+                inputUnwrapInnerPacket = null;
+                try {
+                    inputUnwrapOuterPacket = packetOuterWrapper.unwrap(dataRes);
+                    inputUnwrapInnerPacket = packetInnerWrapper.unwrap(inputUnwrapOuterPacket.getData());
+                } catch (WrapperException e) {
+                    inputUnwrapOuterPacket = null;
+                    inputUnwrapInnerPacket = null;
+                    System.out.println(e.getMessage());
                 }
+                System.out.println("unwrap packet.");
+
+                //pkt = new PacketUnwrapper().unwrap(dataRes);
+
                 strs[0] = "";
                 strs[1] = "";
-                switch(pkt.getPacketNumber()){
+                switch(inputUnwrapInnerPacket.getAddress()){//pkt.getPacketNumber()
                     case settings.N_GSM_SERVER:
                                                 strs[0] = pktParams.GSM_SERVER;
-                                                strs[1] = new String(pkt.getPacketData());
+                                                strs[1] = new String(inputUnwrapInnerPacket.getData());//pkt.getPacketData()
                                                 break;
                     case settings.N_GSM_MONEY_QUERY:
                                                 strs[0] = pktParams.GSM_MONEY_QUERY;
-                                                strs[1] = new String(pkt.getPacketData());
+                                                strs[1] = new String(inputUnwrapInnerPacket.getData());//pkt.getPacketData()
                                                 break;
                     default:
                                                 strs[0] = "";
                                                 strs[1] = "";
                                                 break;
                 }
-            }while(pkt == null);
+            }while(inputUnwrapInnerPacket == null);//pkt == null
             publish(strs);
+            System.out.println("publish");
             while(main.port.isComPortHasData() == true){
                 receiveBytes(1);
             }

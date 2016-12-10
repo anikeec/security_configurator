@@ -12,7 +12,14 @@ public class ReadConfiguration extends SwingWorker{
 
         byte[] data;
         String message = "";
-        PacketWr packet;
+
+        InnerPacket innerPacketToSend;
+        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
+        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
+
+        OuterPacket outerPacketToSend;
+        OuterProtocol packetOuterProtocol = new OuterProtocol(1, 1, 1, 1, 2);
+        OuterWrapper packetOuterWrapper = new OuterWrapper(packetOuterProtocol);
 
         for(int ptr=0;ptr<2;ptr++) {
             message = "Read. Send request. ";
@@ -30,9 +37,24 @@ public class ReadConfiguration extends SwingWorker{
                         message = "Error.";
             }
 
-            packet = new PacketWrapper().wrap((byte)0, ptr, ConfigCommand.COMMAND_READ, data);
+            byte[] innerWrappedData = new byte[0];
+            innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_READ, ptr, data);
             try {
-                main.port.write(packet.data);
+                innerWrappedData = packetInnerWrapper.wrap(innerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            byte[] outerWrappedData = new byte[0];
+            outerPacketToSend = new OuterPacket(0x53, 0x00, innerWrappedData);
+            try {
+                outerWrappedData = packetOuterWrapper.wrap(outerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                main.port.write(outerWrappedData);
                 publish(new String(message + "\r\n"));
                 message = "Error. No answer.";
                 for(int i=0;i<100;i++) {

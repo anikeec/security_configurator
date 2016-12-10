@@ -12,7 +12,14 @@ public class WriteConfiguration extends SwingWorker{
 
         byte[] data;
         String message = "";
-        PacketWr packet;
+
+        InnerPacket innerPacketToSend;
+        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
+        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
+
+        OuterPacket outerPacketToSend;
+        OuterProtocol packetOuterProtocol = new OuterProtocol(1, 1, 1, 1, 2);
+        OuterWrapper packetOuterWrapper = new OuterWrapper(packetOuterProtocol);
 
         try {
             main.port.comPortEnableListener(2);
@@ -38,9 +45,24 @@ public class WriteConfiguration extends SwingWorker{
                         message = "Error.";
             }
 
-            packet = new PacketWrapper().wrap((byte)0, ptr, ConfigCommand.COMMAND_WRITE, data);
+            byte[] innerWrappedData = new byte[0];
+            innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_WRITE, ptr, data);
             try {
-                main.port.write(packet.data);
+                innerWrappedData = packetInnerWrapper.wrap(innerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            byte[] outerWrappedData = new byte[0];
+            outerPacketToSend = new OuterPacket(0x53, 0x00, innerWrappedData);
+            try {
+                outerWrappedData = packetOuterWrapper.wrap(outerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                main.port.write(outerWrappedData);//packet.data
                 main.port.setComPortHasData(false);
                 publish(new String(message + "\r\n"));
                 message = "Error. No answer.";

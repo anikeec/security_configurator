@@ -194,7 +194,7 @@ public class OuterWrapper extends Wrapper{
         int protocolPacketCrcLen = outerProtocol.getPacketCrcLen();
         if(protocolPacketCrcLen == 1){
             Crc8 crc8 = new Crc8();
-            tempPacketCrcCalc = crc8.calc(bb.array());
+            tempPacketCrcCalc = (int)crc8.calc(bb.array());
         } else if(protocolPacketCrcLen == 2){
             bb = createByteBuffer(srcPkt,
                     positionMagicByte,
