@@ -29,8 +29,14 @@ public class TestClass {
         }
         System.out.println();
 
-        Packet testUnwrapPacket = testWrapper.unwrap(testWrapPacket);
-        System.out.println(testUnwrapPacket);
+        Packet testUnwrapPacket = null;
+        try {
+            testUnwrapPacket = testWrapper.unwrap(testWrapPacket);
+            System.out.println(testUnwrapPacket);
+        } catch (WrapperException e) {
+            System.out.println(e.getMessage());
+        }
+
 
     }
 

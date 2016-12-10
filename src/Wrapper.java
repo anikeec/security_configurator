@@ -134,7 +134,171 @@ public class Wrapper {
         return bb.array();
     }
 
-    public Packet unwrap(byte[] srcPkt){
-        return null;
+    public Packet unwrap(byte[] srcPkt) throws WrapperException {
+
+        ByteBuffer bb;
+
+        int positionMagicByte = 0;
+        int positionAddressDst =    positionMagicByte +
+                                    protocol.getMagicByteLen();
+        int positionPacketLength =  positionAddressDst +
+                                    protocol.getAddressDstLen();
+        int positionHeaderCrc = positionPacketLength +
+                                protocol.getPacketLengthLen();
+        int positionData =  positionHeaderCrc +
+                            protocol.getHeaderCrcLen();
+                                                                    // check header CRC
+        bb = createByteBuffer(  srcPkt,
+                                positionMagicByte,
+                                protocol.getHeaderLen() - protocol.getHeaderCrcLen());
+
+        int tempHeaderCrc = 0;
+        int tempHeaderCrcCalc = 0;
+        int protocolHeaderCrcLen = protocol.getHeaderCrcLen();
+        if(protocolHeaderCrcLen == 1){
+            Crc8 crc8 = new Crc8();
+            tempHeaderCrcCalc = crc8.calc(bb.array());
+            tempHeaderCrc = (int)srcPkt[positionHeaderCrc];
+        } else if(protocolHeaderCrcLen == 2){
+            Crc16 crc16 = new Crc16();
+            tempHeaderCrcCalc = crc16.calc(bb.array());
+            bb = createByteBuffer(srcPkt,
+                    positionHeaderCrc,
+                    protocol.getPacketLengthLen());
+            tempHeaderCrc = bb.getInt();
+        } else {
+            throw new WrapperException("error. protocolHeaderCrcLen = " + protocolHeaderCrcLen);
+        }
+
+        if(tempHeaderCrcCalc != tempHeaderCrc){
+            throw new WrapperException("error. CRC header error.");
+        }
+                                                                    // find packet length
+        int tempPacketLength = 0;
+        try {
+            tempPacketLength = findInBuffer(srcPkt, positionPacketLength, protocol.getPacketLengthLen());
+        } catch (WrapperException e){
+            throw  new WrapperException("error. PacketLength error.");
+        }
+        /*
+        int tempPacketLength = 0;
+        int protocolPacketLengthLen = protocol.getPacketLengthLen();
+        if(protocolPacketLengthLen == 1){
+            tempPacketLength = (int)srcPkt[positionPacketLength];
+        } else if(protocolPacketLengthLen == 2){
+            bb = ByteBuffer.wrap(   srcPkt,
+                                    positionPacketLength,
+                                    protocolPacketLengthLen);
+            tempPacketLength = bb.getInt();
+        } else {
+            throw new WrapperException("error. protocolPacketLengthLen = " + protocolPacketLengthLen);
+        }
+        */
+                                                                    // check full packet CRC
+        int tempPacketCrc = 0;
+        try {
+            tempPacketCrc = findInBuffer(srcPkt,
+                                            tempPacketLength -  protocol.getPacketCrcLen(),
+                                            protocol.getPacketCrcLen());
+        } catch (WrapperException e){
+            throw  new WrapperException("error. PacketCrc error.");
+        }
+
+        //int tempPacketCrc = 0;
+        int tempPacketCrcCalc = 0;
+        int protocolPacketCrcLen = protocol.getPacketCrcLen();
+        if(protocolPacketCrcLen == 1){
+            Crc8 crc8 = new Crc8();
+            tempPacketCrcCalc = crc8.calc(bb.array());
+            //tempPacketCrc = (int)srcPkt[tempPacketLength -  protocolPacketCrcLen - 1];
+        } else if(protocolPacketCrcLen == 2){
+            bb = createByteBuffer(srcPkt,
+                    positionMagicByte,
+                    tempPacketLength - protocol.getPacketCrcLen());
+            Crc16 crc16 = new Crc16();
+            tempPacketCrcCalc = crc16.calc(bb.array());
+            //bb = ByteBuffer.wrap(   srcPkt,
+            //                        tempPacketLength -  protocolPacketCrcLen - 1,
+            //                        protocolPacketCrcLen);
+            //tempPacketCrc = bb.getInt();
+        } else {
+            throw new WrapperException("error. protocolPacketCrcLen = " + protocolPacketCrcLen);
+        }
+
+        if(tempPacketCrcCalc != tempPacketCrc){
+            throw new WrapperException("error. CRC packet error.");
+        }
+                                                                    // start to unwrap packet
+        /*
+        int tempAddressDst = 0;
+        int protocolAddressDstLen = protocol.getAddressDstLen();
+        if(protocolAddressDstLen == 1){
+            tempAddressDst = (int)srcPkt[positionAddressDst];
+        } else if(protocolAddressDstLen == 2){
+            bb = ByteBuffer.wrap(   srcPkt,
+                                    positionAddressDst,
+                                    protocolAddressDstLen);
+            tempAddressDst = bb.getInt();
+        } else {
+            throw new WrapperException("error. protocolAddressDstLen = " + protocolAddressDstLen);
+        }
+        */
+
+        int tempMagicByte = 0;
+        try {
+            tempMagicByte = findInBuffer(srcPkt, positionMagicByte, protocol.getMagicByteLen());
+        } catch (WrapperException e){
+            throw  new WrapperException("error. MagicByte error.");
+        }
+
+        int tempAddressDst = 0;
+        try {
+            tempAddressDst = findInBuffer(srcPkt, positionAddressDst, protocol.getAddressDstLen());
+        } catch (WrapperException e){
+            throw  new WrapperException("error. AddressDst error.");
+        }
+
+        bb = createByteBuffer(srcPkt,
+                positionData,
+                tempPacketLength - protocol.getHeaderLen() - protocol.getPacketCrcLen());
+        byte[] packetData = bb.array();
+
+        Packet packet = new Packet(tempMagicByte, tempAddressDst, packetData);
+        packet.setPacketLength(tempPacketLength);
+        packet.setHeaderCrc(tempHeaderCrc);
+        packet.setPacketCrc(tempPacketCrc);
+        packet.setHeaderLength( protocol.getMagicByteLen() +
+                                protocol.getAddressDstLen() +
+                                protocol.getPacketLengthLen() +
+                                protocol.getHeaderCrcLen());
+
+        return packet;
+    }
+
+    int findInBuffer(byte[] buffer, int startPosition, int length) throws WrapperException {
+        ByteBuffer bb;
+        int tempReturn;
+
+        if(length == 1){
+            tempReturn = (int)buffer[startPosition];
+        } else if(length == 2){
+            bb = createByteBuffer(buffer,
+                    startPosition,
+                    length);
+            bb.position(0);
+            tempReturn = bb.getShort();
+        } else {
+            throw new WrapperException();
+        }
+
+        return tempReturn;
+    }
+
+    ByteBuffer createByteBuffer(byte[] buffer, int start, int length) {
+        ByteBuffer bb = ByteBuffer.allocate(length);
+        for(int i=0; i<length; i++){
+            bb.put(buffer[start + i]);
+        }
+        return bb;
     }
 }
