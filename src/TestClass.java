@@ -10,29 +10,29 @@ public class TestClass {
         int headerCrcLen = 1;
         int packetCrcLen = 2;
 
-        Protocol testProtocol = new Protocol(magicByteLen, addressLen, packetLengthLen, headerCrcLen, packetCrcLen);
+        OuterProtocol testOuterProtocol = new OuterProtocol(magicByteLen, addressLen, packetLengthLen, headerCrcLen, packetCrcLen);
 
         int magicByte = 0x53;
         int addressDst = 0x00;
         byte[] srcBytes = new byte[]{0x02, 0x00, 0x00, 'w','w','w','.','k','y','i','v','s','t','a','r','.','c','o','m'};
 
-        Packet testPacket = new Packet(magicByte, addressDst, srcBytes);
+        OuterPacket testOuterPacket = new OuterPacket(magicByte, addressDst, srcBytes);
 
-        Wrapper testWrapper = new Wrapper(testProtocol);
+        OuterWrapper testOuterWrapper = new OuterWrapper(testOuterProtocol);
 
         byte[] testWrapPacket = new byte[0];
         try {
-            testWrapPacket = testWrapper.wrap(testPacket);
+            testWrapPacket = testOuterWrapper.wrap(testOuterPacket);
             System.out.println(testWrapPacket);
         } catch (WrapperException e) {
             System.out.println(e.getMessage());
         }
         System.out.println();
 
-        Packet testUnwrapPacket = null;
+        OuterPacket testUnwrapOuterPacket = null;
         try {
-            testUnwrapPacket = testWrapper.unwrap(testWrapPacket);
-            System.out.println(testUnwrapPacket);
+            testUnwrapOuterPacket = testOuterWrapper.unwrap(testWrapPacket);
+            System.out.println(testUnwrapOuterPacket);
         } catch (WrapperException e) {
             System.out.println(e.getMessage());
         }

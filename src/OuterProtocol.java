@@ -1,14 +1,14 @@
 /**
  * Created by Ksusha on 09.12.2016.
  */
-public class Protocol {
+public class OuterProtocol {
     private int magicByteLen;
     private int addressDstLen;
     private int packetLengthLen;
     private int headerCrcLen;
     private int packetCrcLen;
 
-    public Protocol() {
+    public OuterProtocol() {
         this.magicByteLen = 1;
         this.addressDstLen = 1;
         this.packetLengthLen = 1;
@@ -16,7 +16,7 @@ public class Protocol {
         this.packetCrcLen = 2;
     }
 
-    public Protocol(int magicByteLen, int addressDstLen, int packetLengthLen, int headerCrcLen, int packetCrcLen) {
+    public OuterProtocol(int magicByteLen, int addressDstLen, int packetLengthLen, int headerCrcLen, int packetCrcLen) {
         this.magicByteLen = magicByteLen;
         this.addressDstLen = addressDstLen;
         this.packetLengthLen = packetLengthLen;

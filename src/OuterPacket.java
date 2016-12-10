@@ -3,7 +3,7 @@ import java.util.Arrays;
 /**
  * Created by Ksusha on 09.12.2016.
  */
-public class Packet {
+public class OuterPacket {
     private int magicByte;
     private int addressDst;
     private int packetLength;
@@ -12,7 +12,7 @@ public class Packet {
     private byte[] data;
     private int packetCrc;
 
-    public Packet(int magicByte, int addressDst, byte[] data) {
+    public OuterPacket(int magicByte, int addressDst, byte[] data) {
         this.magicByte = magicByte;
         this.addressDst = addressDst;
         packetLength = 0;
