@@ -16,7 +16,7 @@ public abstract class Wrapper {
                     startPosition,
                     length);
             bb.position(0);
-            tempReturn = bb.getShort();
+            tempReturn = ((int)bb.getShort())&0x0000FFFF;
         } else {
             throw new WrapperException();
         }
