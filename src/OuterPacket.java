@@ -3,13 +3,12 @@ import java.util.Arrays;
 /**
  * Created by Ksusha on 09.12.2016.
  */
-public class OuterPacket {
+public class OuterPacket extends Packet{
     private int magicByte;
     private int addressDst;
     private int packetLength;
     private int headerCrc;
     private int headerLength;
-    private byte[] data;
     private int packetCrc;
 
     public OuterPacket(int magicByte, int addressDst, byte[] data) {
@@ -73,14 +72,6 @@ public class OuterPacket {
 
     public void setHeaderLength(int headerLength) {
         this.headerLength = headerLength;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     public int getPacketCrc() {

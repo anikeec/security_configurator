@@ -1,7 +1,7 @@
 /**
  * Created by Ksusha on 09.12.2016.
  */
-public class OuterProtocol {
+public class OuterProtocol extends Protocol{
     private int magicByteLen;
     private int addressDstLen;
     private int packetLengthLen;
