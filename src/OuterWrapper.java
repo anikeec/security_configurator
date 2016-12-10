@@ -79,7 +79,7 @@ public class OuterWrapper {
         if(protocolAddressDstLen == 1){
             bb.put((byte)srcPkt.getAddressDst());
         } else if(protocolAddressDstLen == 2){
-            bb.putShort((short) srcPkt.getMagicByte());
+            bb.putShort((short) srcPkt.getAddressDst());
         } else {
             throw new WrapperException("error. protocolAddressDstLen = " + protocolAddressDstLen);
         }
@@ -88,7 +88,7 @@ public class OuterWrapper {
         if(protocolPacketLengthLen == 1){
             bb.put((byte)srcPkt.getPacketLength());
         } else if(protocolPacketLengthLen == 2){
-            bb.putShort((short) srcPkt.getMagicByte());
+            bb.putShort((short) srcPkt.getPacketLength());
         } else {
             throw new WrapperException("error. protocolPacketLengthLen = " + protocolPacketLengthLen);
         }
