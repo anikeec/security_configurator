@@ -10,8 +10,10 @@ public class InputCheck {
 
         if((text.length()<minLen)||(text.length() > maxLen)) {
             textField.setForeground(Color.red);
-            saveButton.setEnabled(false);
             error = true;
+        }
+        if(error == false){
+            textField.setForeground(Color.black);
         }
         /*
         if(error == false){

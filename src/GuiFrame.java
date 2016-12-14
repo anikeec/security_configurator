@@ -38,13 +38,11 @@ public class GuiFrame extends JFrame{
     public JButton          buttonWrite;
     public JButton          buttonPortOpenClose;
     private JComboBox       comboBox;
-    private JLabel          labelGprsPage;
-    private JTextField      inputGprsPage;
     private JScrollPane     scrollpane;
 
     public JTextArea textArea;
 
-    private ChangeListener  propertyChangeListener;
+    private ChangeListener  propertyChangeListener = new ChangeListener();
 
     ArrayList<JLabel>       labelList = new ArrayList<JLabel>();
     ArrayList<JTextField>   fieldsList = new ArrayList<JTextField>();
@@ -631,25 +629,25 @@ public class GuiFrame extends JFrame{
                 (textField == Gui.getGuiByName(Param.GPRS_PAGE)) ) {
                 minLen = 5;
                 maxLen = 16;
-            }
+            } else
             if(textField == Gui.getGuiByName(Param.GSM_MONEY_QUERY)){     // money query
                 minLen = 5;
                 maxLen = 5;
-            }
+            } else
             if(textField == Gui.getGuiByName(Param.GPRS_PORT)){     // port
                 minLen = 2;
                 maxLen = 5;
-            }
+            } else
             if(textField == Gui.getGuiByName(Param.GPRS_TIMEOUT)){     // timeout
                 minLen = 1;
                 maxLen = 5;
-            }
+            } else
             if( (textField == Gui.getGuiByName(Param.USER1_PASSW)) || // password
                 (textField == Gui.getGuiByName(Param.USER2_PASSW)) ||
                 (textField == Gui.getGuiByName(Param.USER3_PASSW)) ) {
                 minLen = 6;
                 maxLen = 6;
-            }
+            } else
             if( (textField == Gui.getGuiByName(Param.USER1_PHONE)) || // phone
                 (textField == Gui.getGuiByName(Param.USER2_PHONE)) ||
                 (textField == Gui.getGuiByName(Param.USER3_PHONE)) ) {
