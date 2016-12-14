@@ -103,10 +103,10 @@ public class AnswerConfiguration extends SwingWorker{
                 strs[1] = "";
                 packetAnswer = new byte[]{'o','k'};
 
-                strs[0] = Elements.getNameById(inputUnwrapInnerPacket.getAddress());
+                strs[0] = Gui.getNameById(inputUnwrapInnerPacket.getAddress());
                 if(strs[0] != "Error.") {
                     strs[1] = new String(inputUnwrapInnerPacket.getData());
-                    packetAnswer = Elements.getValueByName(strs[0]).getBytes();
+                    packetAnswer = Gui.getValueByName(strs[0]).getBytes();
                 }
 
             } while(inputUnwrapInnerPacket == null);
@@ -182,7 +182,8 @@ public class AnswerConfiguration extends SwingWorker{
         super.process(chunks);
         if(chunks.size() == 3){
             String key = chunks.get(0).toString();
-            Object obj = main.gui.getGui().get(key);
+            Object obj = Gui.getGuiByName(key);
+            //Object obj = main.gui.getGui().get(key);
             String text = chunks.get(1).toString();
             main.gui.inputSetText((JTextField)obj,text);
             main.gui.textArea.append(chunks.get(2).toString());

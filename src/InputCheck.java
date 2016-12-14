@@ -13,6 +13,7 @@ public class InputCheck {
             saveButton.setEnabled(false);
             error = true;
         }
+        /*
         if(error == false){
             //main.config.setGsmServer(text);
             String key = "";
@@ -32,7 +33,7 @@ public class InputCheck {
             textField.setForeground(Color.black);
             saveButton.setEnabled(true);
         }
-
+        */
         return true;
     }
 }

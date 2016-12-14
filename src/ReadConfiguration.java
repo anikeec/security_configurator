@@ -36,8 +36,8 @@ public class ReadConfiguration extends SwingWorker{
 
             message = "Read. Send request. ";
 
-            data = Elements.getValueByName(Elements.getNameById(ptr)).getBytes();
-            message +=  Elements.getNameById(ptr);
+            data = Gui.getValueByName(Gui.getNameById(ptr)).getBytes();
+            message +=  Gui.getNameById(ptr);
 
             try {
                 innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_READ, ptr, data);
@@ -114,7 +114,7 @@ public class ReadConfiguration extends SwingWorker{
             strs[0] = "";
             strs[1] = "";
 
-            strs[0] = Elements.getNameById(inputUnwrapInnerPacket.getAddress());
+            strs[0] = Gui.getNameById(inputUnwrapInnerPacket.getAddress());
             if(strs[0] != "Error.") {
                 strs[1] = new String(inputUnwrapInnerPacket.getData());
                 publish(strs);
@@ -137,7 +137,8 @@ public class ReadConfiguration extends SwingWorker{
         String str;
         if(chunks.size() >= 2){
             String key = chunks.get(0).toString();
-            Object obj = main.gui.getGui().get(key);
+            Object obj = Gui.getGuiByName(key);
+            //Object obj = main.gui.getGui().get(key);
             String text = chunks.get(1).toString();
             main.gui.inputSetText((JTextField)obj,text);
             str = chunks.get(2).toString();

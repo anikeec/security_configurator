@@ -36,8 +36,8 @@ public class WriteConfiguration extends SwingWorker{
 
             message = "Write. Send request. ";
 
-            data = Elements.getValueByName(Elements.getNameById(ptr)).getBytes();
-            message +=  Elements.getNameById(ptr);
+            data = Gui.getValueByName(Gui.getNameById(ptr)).getBytes();
+            message +=  Gui.getNameById(ptr);
 
             try {
                 innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_WRITE, ptr, data);

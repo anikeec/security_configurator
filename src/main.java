@@ -9,7 +9,7 @@ public class main{
 
     public static void main(String[] args) {
         new main();
-        new Elements();
+        new Gui();
         gui = new GuiFrame();
     }
 
