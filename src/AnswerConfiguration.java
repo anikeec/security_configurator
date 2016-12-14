@@ -2,6 +2,8 @@ import jssc.SerialPortException;
 
 import javax.swing.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,57 +16,71 @@ public class AnswerConfiguration extends SwingWorker{
 
         byte[] data;
         byte[] dataRes;
+        byte[] packetAnswer = null;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //PacketUnwr pkt = null;
         String[] strs = new String[2];
+        String message = "";
+        boolean error = false;
 
         InnerPacket innerPacketToSend;
-        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
-        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
-
         OuterPacket outerPacketToSend;
+        InnerPacket inputUnwrapInnerPacket = null;
+        OuterPacket inputUnwrapOuterPacket = null;
+        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
         OuterProtocol packetOuterProtocol = new OuterProtocol(1, 1, 1, 1, 2);
+        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
         OuterWrapper packetOuterWrapper = new OuterWrapper(packetOuterProtocol);
 
-        OuterPacket inputUnwrapOuterPacket = null;
-        InnerPacket inputUnwrapInnerPacket = null;
 
-        //main.port.comPortEnableListener(1);
-
+        FileInputStream fis = null;
         FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream("log.txt");
-            PrintStream prn = new PrintStream(fos);
-            System.setOut(prn);
-        } catch (FileNotFoundException e) {
-            publish("Error. Logging error. " + e.getMessage() + "\r\n");
+        byte[] tempBuffer = null;
+        synchronized (this.getClass()) {
+            try {
+                fis = new FileInputStream("log.txt");
+                if (fis.available() != 0) {
+                    tempBuffer = new byte[fis.available()];
+                    fis.read(tempBuffer);
+                }
+                if (fis != null) fis.close();
+
+                fos = new FileOutputStream("log.txt");
+                PrintStream prn = new PrintStream(fos);
+                System.setOut(prn);
+            } catch (FileNotFoundException e) {
+            }
+
+            if (tempBuffer != null) {
+                System.out.println(tempBuffer);
+            }
         }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss z");
+        System.out.println(dateFormat.format( new Date() ));
 
         while(true) {
             data = null;
             baos.reset();
-            //pkt = null;
             inputUnwrapInnerPacket = null;
             do {
                 System.out.println("start receive header");
-                data = receiveBytes(packetOuterProtocol.getHeaderLen());//PacketUnwrapper.PACKET_HEADER_LENGTH
+                data = receiveBytes(packetOuterProtocol.getHeaderLen());
                 int length = -1;
                 try {
                     length = packetOuterWrapper.unwrapHeaderLength(data);
                 } catch (WrapperException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("Error. UnwrapHeader. " + e.getMessage());
                 }
-                //new PacketUnwrapper().packetLength(data);
-                if(length == -1){
+
+                if(length == -1) {
                     data = null;
                     baos.reset();
-                    //pkt = null;
                     inputUnwrapInnerPacket = null;
                     continue;
                 }
                 baos.write(data);
-                System.out.println("receive " + data.length + " bytes");
+                System.out.println("received " + data.length + " bytes");
                 System.out.println("receive other " + (length  - data.length) + " bytes");
+
                 data = receiveBytes(length  - data.length);
                 baos.write(data);
                 dataRes = baos.toByteArray();
@@ -78,36 +94,52 @@ public class AnswerConfiguration extends SwingWorker{
                 } catch (WrapperException e) {
                     inputUnwrapOuterPacket = null;
                     inputUnwrapInnerPacket = null;
-                    System.out.println(e.getMessage());
+                    System.out.println("Error. UnwrapPacket. " + e.getMessage());
+                    break;
                 }
                 System.out.println("unwrap packet.");
 
-                //pkt = new PacketUnwrapper().unwrap(dataRes);
-
                 strs[0] = "";
                 strs[1] = "";
-                switch(inputUnwrapInnerPacket.getAddress()){//pkt.getPacketNumber()
-                    case settings.N_GSM_SERVER:
-                                                strs[0] = pktParams.GSM_SERVER;
-                                                strs[1] = new String(inputUnwrapInnerPacket.getData());//pkt.getPacketData()
-                                                break;
-                    case settings.N_GSM_MONEY_QUERY:
-                                                strs[0] = pktParams.GSM_MONEY_QUERY;
-                                                strs[1] = new String(inputUnwrapInnerPacket.getData());//pkt.getPacketData()
-                                                break;
-                    default:
-                                                strs[0] = "";
-                                                strs[1] = "";
-                                                break;
+                packetAnswer = new byte[]{'o','k'};
+
+                strs[0] = settings.readParameterName(inputUnwrapInnerPacket.getAddress());
+                if(strs[0] != "Error.") {
+                    strs[1] = new String(inputUnwrapInnerPacket.getData());
+                    packetAnswer = settings.getSet().get(strs[0]).getBytes();
                 }
-            }while(inputUnwrapInnerPacket == null);//pkt == null
-            publish(strs);
+
+            } while(inputUnwrapInnerPacket == null);
+
+            int address = inputUnwrapInnerPacket.getAddress();
+            int command = inputUnwrapInnerPacket.getCommand();
+
+            if(command == ConfigCommand.COMMAND_WRITE) {
+                publish(strs);
+            }
             System.out.println("publish");
             while(main.port.isComPortHasData() == true){
                 receiveBytes(1);
             }
+
+            byte[] innerWrappedData = new byte[0];
+            innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_ANSWER, address, packetAnswer);
             try {
-                main.port.write("ok");
+                innerWrappedData = packetInnerWrapper.wrap(innerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            byte[] outerWrappedData = new byte[0];
+            outerPacketToSend = new OuterPacket(0x53, 0x00, innerWrappedData);
+            try {
+                outerWrappedData = packetOuterWrapper.wrap(outerPacketToSend);
+            } catch (WrapperException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                main.port.write(outerWrappedData);
             } catch (SerialPortException e) {
                 publish("Error. " + e.getMessage() + "\r\n");
                 throw e;

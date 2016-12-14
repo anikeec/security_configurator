@@ -5,4 +5,5 @@ public class ConfigCommand {
     public static final byte COMMAND_STATUS  = 0;
     public static final byte COMMAND_READ    = 1;
     public static final byte COMMAND_WRITE   = 2;
+    public static final byte COMMAND_ANSWER  = 3;
 }

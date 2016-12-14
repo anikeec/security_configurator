@@ -11,6 +11,16 @@ public class ComPort {
     private SerialPort comPort = null;
     private SerialPortEventListener portListener;
     private boolean comPortHasData = false;
+
+    public boolean isComPortDataSent() {
+        return comPortDataSent;
+    }
+
+    public void setComPortDataSent(boolean comPortDataSent) {
+        this.comPortDataSent = comPortDataSent;
+    }
+
+    private boolean comPortDataSent = false;
     private StringBuilder receiveString = new StringBuilder();
 
     public void portFind(){
@@ -63,10 +73,14 @@ public class ComPort {
             return true;
     }
 
-    public byte[] read() throws SerialPortException {
-        byte[] readData = new byte[0];
+    public boolean writeAndWait(byte[] data) throws SerialPortException {
+        setComPortDataSent(false);
+        comPort.writeBytes(data);
+        return true;
+    }
 
-        readData = comPort.readBytes();
+    public byte[] read() throws SerialPortException {
+        byte[] readData = comPort.readBytes();
         return readData;
     }
 
@@ -82,8 +96,6 @@ public class ComPort {
                 receiveString.delete(0,receiveString.length());
                 return true;
             }
-            //if(new String(readBuffer).equals("ok")) return true;
-            //else    return false;
             return false;
         } catch (SerialPortException e) {
             receiveString.delete(0,receiveString.length());
@@ -133,6 +145,9 @@ public class ComPort {
         public void serialEvent(SerialPortEvent serialPortEvent) {
             if( serialPortEvent.isRXCHAR() && (serialPortEvent.getEventValue() >= waitBytes)){
                 setComPortHasData(true);
+            }
+            if( serialPortEvent.isTXEMPTY() ) {
+                setComPortDataSent(true);
             }
         }
     }

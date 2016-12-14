@@ -1,6 +1,9 @@
 import jssc.SerialPortException;
+import jssc.SerialPortTimeoutException;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
@@ -8,95 +11,116 @@ import java.util.List;
  */
 public class WriteConfiguration extends SwingWorker{
     @Override
-    protected Object doInBackground() throws InterruptedException, SerialPortException {
+    protected Object doInBackground() throws InterruptedException {
 
         byte[] data;
         String message = "";
+        boolean error = false;
 
+        byte[] innerWrappedData;
+        byte[] outerWrappedData;
+        OuterPacket inputUnwrapOuterPacket;
+        InnerPacket inputUnwrapInnerPacket;
         InnerPacket innerPacketToSend;
-        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
-        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
-
         OuterPacket outerPacketToSend;
+        InnerProtocol packetInnerProtocol = new InnerProtocol(1, 2);
         OuterProtocol packetOuterProtocol = new OuterProtocol(1, 1, 1, 1, 2);
+        InnerWrapper packetInnerWrapper = new InnerWrapper(packetInnerProtocol);
         OuterWrapper packetOuterWrapper = new OuterWrapper(packetOuterProtocol);
 
-        try {
-            main.port.comPortEnableListener(2);
-        } catch (SerialPortException e) {
-            publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
-            publish(new String("Write OK"));//to enable write button
-            throw e;
-        }
+        JsscByteWriter byteWriter = new JsscByteWriter(main.port.getPort());
+        JsscByteReader byteReader = new JsscByteReader(main.port.getPort());
+
 
         for(int ptr=0;ptr<2;ptr++) {
+
             message = "Write. Send request. ";
-            switch(ptr){
-                case settings.N_GSM_SERVER:
-                        data = settings.getSet().get(pktParams.GSM_SERVER).getBytes();
-                        message += pktParams.GSM_SERVER;
-                        break;
-                case settings.N_GSM_MONEY_QUERY:
-                        data = settings.getSet().get(pktParams.GSM_MONEY_QUERY).getBytes();
-                        message += pktParams.GSM_MONEY_QUERY;
-                        break;
-                default:
-                        data = new byte[]{0};
-                        message = "Error.";
-            }
 
-            byte[] innerWrappedData = new byte[0];
-            innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_WRITE, ptr, data);
+            //data = settings.readParameterField(ptr);
+            data = settings.getSet().get(settings.readParameterName(ptr)).getBytes();
+            message +=  settings.readParameterName(ptr);
+
             try {
+                innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_WRITE, ptr, data);
                 innerWrappedData = packetInnerWrapper.wrap(innerPacketToSend);
-            } catch (WrapperException e) {
-                e.printStackTrace();
-            }
-
-            byte[] outerWrappedData = new byte[0];
-            outerPacketToSend = new OuterPacket(0x53, 0x00, innerWrappedData);
-            try {
+                outerPacketToSend = new OuterPacket(0x53, 0x00, innerWrappedData);
                 outerWrappedData = packetOuterWrapper.wrap(outerPacketToSend);
             } catch (WrapperException e) {
-                e.printStackTrace();
+                outerWrappedData = null;
+                message = ("Error. WrapPacket - " + e.getMessage());
+                error = true;
+                break;
             }
 
             try {
-                main.port.write(outerWrappedData);//packet.data
-                main.port.setComPortHasData(false);
-                publish(new String(message + "\r\n"));
-                message = "Error. No answer.";
-                for(int i=0;i<100;i++) {
-                    Thread.sleep(30);
-                    if(main.port.isComPortHasData() == true)
-                    {
-                        if(main.port.waitOk()) {
-                            message = "OK";
-                            break;
-                        }
-                    }
-                }
-                Thread.sleep(200);
-                publish(new String(message + "\r\n"));
-                if(message.equals("OK") == false)   break;
-            } catch (SerialPortException e){
-                publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
-                publish(new String("Write OK"));
-                throw e;
+                byteWriter.write(outerWrappedData,200);
+            } catch (IOException e) {
+                message = ("Error. " + e.getMessage() + "\r\n");
+                error = true;
+                break;
             } catch (InterruptedException e) {
-                publish("Error. Timeout.");
-                publish(new String("Write OK"));
-                throw e;
+                message = ("Error. Timeout.");
+                error = true;
+                break;
             }
+            publish(new String(message + "\r\n"));
+
+
+            byte[] packetHeader = new byte[0];
+            int length = -1;
+            byte[] packetBody = new byte[0];
+            try {
+                packetHeader = byteReader.read(packetOuterProtocol.getHeaderLen(),2000);
+                length = packetOuterWrapper.unwrapHeaderLength(packetHeader);
+                packetBody = byteReader.read(length - packetHeader.length,2000);
+            } catch (IOException e) {
+                message = ("Error. IOException - " + e.getMessage());
+                error = true;
+                break;
+            } catch (InterruptedException e) {
+                message = ("Error. InterruptedException.");
+                error = true;
+                break;
+            } catch (SerialPortTimeoutException e) {
+                message = ("Error. SerialPortTimeoutException.");
+                error = true;
+                break;
+            } catch (WrapperException e) {
+                message = ("Error. UnwrapHeader - " + e.getMessage());
+                error = true;
+                break;
+            } catch (SerialPortException e) {
+                message = ("Error. SerialPortException - " + e.getMessage());
+                error = true;
+                break;
+            }
+
+            ByteBuffer bb = ByteBuffer.allocate(length);
+            bb.put(packetHeader);
+            bb.put(packetBody);
+            byte[] packetFull = bb.array();
+
+            try {
+                inputUnwrapOuterPacket = packetOuterWrapper.unwrap(packetFull);
+                inputUnwrapInnerPacket = packetInnerWrapper.unwrap(inputUnwrapOuterPacket.getData());
+            } catch (WrapperException e) {
+                inputUnwrapInnerPacket = null;
+                message = ("Error. UnwrapPacket - " + e.getMessage());
+                error = true;
+                break;
+            }
+
+            Thread.sleep(200);
+            message = new String(inputUnwrapInnerPacket.getData());
+            publish(new String(message + "\r\n"));
         }
-        try {
-            main.port.comPortDisableListener();
-        } catch (SerialPortException e) {
-            publish("Error. " + e.getPortName() + " - " + e.getExceptionType() + "\r\n");
-            throw e;
-        } finally {
-            publish(new String("Write OK"));
+
+        if(error){
+            publish(message + "\r\n");
         }
+
+        publish(new String("Write OK"));
+
         return null;
     }
 
