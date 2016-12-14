@@ -107,11 +107,6 @@ public class GuiFrame extends JFrame{
 
         panelCenter = new JPanel();
 
-        map.put(pktParams.GSM_SERVER,fieldsList.get(0));
-        map.put(pktParams.GSM_MONEY_QUERY,fieldsList.get(1));
-        map.put(pktParams.GPRS_SERVER,fieldsList.get(2));
-        map.put(pktParams.GPRS_PORT,fieldsList.get(3));
-
         buttonOpen.setText("Open File");
         buttonSave.setText("Save File");
         buttonRead.setText("Read Data");
@@ -122,6 +117,7 @@ public class GuiFrame extends JFrame{
         initComboBoxes();
         initCheckBoxes();
         initFields();
+        initGuiMap();
 
         buttonRead.setEnabled(false);
         buttonWrite.setEnabled(false);
@@ -139,10 +135,6 @@ public class GuiFrame extends JFrame{
         buttonPortOpenClose.addActionListener(new portOpenCloseButtonAction());
 
         textArea.addPropertyChangeListener(propertyChangeListener);
-        fieldsList.get(0).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(0))));
-        fieldsList.get(0).addCaretListener(new inputCaretListener(new InputCheckInfo(fieldsList.get(0))));
-        fieldsList.get(1).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(1))));
-        fieldsList.get(1).addCaretListener(new inputCaretListener(new InputCheckInfo(fieldsList.get(1))));
 
         panelTop.add(buttonOpen);
         panelTop.add(buttonSave);
@@ -452,6 +444,42 @@ public class GuiFrame extends JFrame{
         fieldsList.get(9).setText(settings.getSet().get(pktParams.USER2_PHONE));
         fieldsList.get(10).setText(settings.getSet().get(pktParams.USER3_PASSW));
         fieldsList.get(11).setText(settings.getSet().get(pktParams.USER3_PHONE));
+
+        for(int i=0;i<fieldsList.size();i++){
+            fieldsList.get(i).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(i))));
+            fieldsList.get(i).addCaretListener(new inputCaretListener(new InputCheckInfo(fieldsList.get(i))));
+        }
+    }
+
+    void initGuiMap(){
+        map.put(pktParams.GSM_SERVER,fieldsList.get(0));
+        map.put(pktParams.GSM_MONEY_QUERY,fieldsList.get(1));
+        map.put(pktParams.GPRS_SERVER,fieldsList.get(2));
+        map.put(pktParams.GPRS_PORT,fieldsList.get(3));
+        map.put(pktParams.GPRS_PAGE,fieldsList.get(4));
+        map.put(pktParams.GPRS_TIMEOUT,fieldsList.get(5));
+        map.put(pktParams.USER1_PASSW,fieldsList.get(6));
+        map.put(pktParams.USER1_PHONE,fieldsList.get(7));
+        map.put(pktParams.USER2_PASSW,fieldsList.get(8));
+        map.put(pktParams.USER2_PHONE,fieldsList.get(9));
+        map.put(pktParams.USER3_PASSW,fieldsList.get(10));
+        map.put(pktParams.USER3_PHONE,fieldsList.get(11));
+        map.put(pktParams.GPRS_ON_OFF,checkBoxesList.get(0));
+        map.put(pktParams.ZONE1_ON_OFF,checkBoxesList.get(1));
+        map.put(pktParams.ZONE2_ON_OFF,checkBoxesList.get(2));
+        map.put(pktParams.ZONE3_ON_OFF,checkBoxesList.get(3));
+        map.put(pktParams.OUT1_ON_OFF,checkBoxesList.get(4));
+        map.put(pktParams.OUT2_ON_OFF,checkBoxesList.get(5));
+        map.put(pktParams.OUT3_ON_OFF,checkBoxesList.get(6));
+        map.put(pktParams.USER1_ON_OFF,checkBoxesList.get(7));
+        map.put(pktParams.USER2_ON_OFF,checkBoxesList.get(8));
+        map.put(pktParams.USER3_ON_OFF,checkBoxesList.get(9));
+        map.put(pktParams.ZONE1_STATE_NORM,comboBoxesList.get(0));
+        map.put(pktParams.ZONE2_STATE_NORM,comboBoxesList.get(1));
+        map.put(pktParams.ZONE3_STATE_NORM,comboBoxesList.get(2));
+        map.put(pktParams.OUT1_STATE_NORM,comboBoxesList.get(3));
+        map.put(pktParams.OUT2_STATE_NORM,comboBoxesList.get(4));
+        map.put(pktParams.OUT3_STATE_NORM,comboBoxesList.get(5));
     }
 
     class ChangeListener implements PropertyChangeListener {
@@ -612,13 +640,35 @@ public class GuiFrame extends JFrame{
 
         public InputCheckInfo(JTextField textField) {
             this.textField = textField;
-            if(textField == fieldsList.get(0)){
+            if( (textField == fieldsList.get(0)) || // servers & page
+                (textField == fieldsList.get(2)) ||
+                (textField == fieldsList.get(4)) ) {
                 minLen = 5;
                 maxLen = 16;
             }
-            if(textField == fieldsList.get(1)){
+            if(textField == fieldsList.get(1)){     // money query
                 minLen = 5;
+                maxLen = 5;
+            }
+            if(textField == fieldsList.get(3)){     // port
+                minLen = 2;
+                maxLen = 5;
+            }
+            if(textField == fieldsList.get(5)){     // timeout
+                minLen = 1;
+                maxLen = 5;
+            }
+            if( (textField == fieldsList.get(6)) || // password
+                (textField == fieldsList.get(8)) ||
+                (textField == fieldsList.get(10)) ) {
+                minLen = 6;
                 maxLen = 6;
+            }
+            if( (textField == fieldsList.get(7)) || // phone
+                (textField == fieldsList.get(9)) ||
+                (textField == fieldsList.get(11)) ) {
+                minLen = 13;
+                maxLen = 13;
             }
         }
     }
