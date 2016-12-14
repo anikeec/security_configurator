@@ -86,7 +86,7 @@ public class GuiFrame extends JFrame{
         textArea = new JTextArea();
         scrollpane = new JScrollPane(textArea,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        for(int i=0;i<20;i++){//settings.getSet().size()
+        for(int i=0;i<20;i++){
             labelList.add(new JLabelBorder());
             labelList.get(i).setText("label" + i);
         }
@@ -355,54 +355,54 @@ public class GuiFrame extends JFrame{
         checkBoxesList.get(8).setText("User 2");
         checkBoxesList.get(9).setText("User 3");
 
-        if(settings.getSet().get(pktParams.GPRS_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.GPRS_ON_OFF).equals("1")) {
             checkBoxesList.get(0).setSelected(true);
         } else {
             checkBoxesList.get(0).setSelected(false);
         }
-        if(settings.getSet().get(pktParams.ZONE1_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.ZONE1_ON_OFF).equals("1")) {
             checkBoxesList.get(1).setSelected(true);
             comboBoxesList.get(0).setEnabled(true);
         } else {
             checkBoxesList.get(1).setSelected(false);
             comboBoxesList.get(0).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.ZONE2_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.ZONE2_ON_OFF).equals("1")) {
             checkBoxesList.get(2).setSelected(true);
             comboBoxesList.get(1).setEnabled(true);
         } else {
             checkBoxesList.get(2).setSelected(false);
             comboBoxesList.get(1).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.ZONE3_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.ZONE3_ON_OFF).equals("1")) {
             checkBoxesList.get(3).setSelected(true);
             comboBoxesList.get(2).setEnabled(true);
         } else {
             checkBoxesList.get(3).setSelected(false);
             comboBoxesList.get(2).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.OUT1_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.OUT1_ON_OFF).equals("1")) {
             checkBoxesList.get(4).setSelected(true);
             comboBoxesList.get(3).setEnabled(true);
         } else {
             checkBoxesList.get(4).setSelected(false);
             comboBoxesList.get(3).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.OUT2_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.OUT2_ON_OFF).equals("1")) {
             checkBoxesList.get(5).setSelected(true);
             comboBoxesList.get(4).setEnabled(true);
         } else {
             checkBoxesList.get(5).setSelected(false);
             comboBoxesList.get(4).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.OUT3_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.OUT3_ON_OFF).equals("1")) {
             checkBoxesList.get(6).setSelected(true);
             comboBoxesList.get(5).setEnabled(true);
         } else {
             checkBoxesList.get(6).setSelected(false);
             comboBoxesList.get(5).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.USER1_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.USER1_ON_OFF).equals("1")) {
             checkBoxesList.get(7).setSelected(true);
             fieldsList.get(6).setEnabled(true);
             fieldsList.get(7).setEnabled(true);
@@ -411,7 +411,7 @@ public class GuiFrame extends JFrame{
             fieldsList.get(6).setEnabled(false);
             fieldsList.get(7).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.USER2_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.USER2_ON_OFF).equals("1")) {
             checkBoxesList.get(8).setSelected(true);
             fieldsList.get(8).setEnabled(true);
             fieldsList.get(9).setEnabled(true);
@@ -420,7 +420,7 @@ public class GuiFrame extends JFrame{
             fieldsList.get(8).setEnabled(false);
             fieldsList.get(9).setEnabled(false);
         }
-        if(settings.getSet().get(pktParams.USER3_ON_OFF).equals("1")) {
+        if(Elements.getValueByName(pktParams.USER3_ON_OFF).equals("1")) {
             checkBoxesList.get(9).setSelected(true);
             fieldsList.get(10).setEnabled(true);
             fieldsList.get(11).setEnabled(true);
@@ -432,18 +432,18 @@ public class GuiFrame extends JFrame{
     }
 
     void initFields(){
-        fieldsList.get(0).setText(settings.getSet().get(pktParams.GSM_SERVER));
-        fieldsList.get(1).setText(settings.getSet().get(pktParams.GSM_MONEY_QUERY));
-        fieldsList.get(2).setText(settings.getSet().get(pktParams.GPRS_SERVER));
-        fieldsList.get(3).setText(settings.getSet().get(pktParams.GPRS_PORT));
-        fieldsList.get(4).setText(settings.getSet().get(pktParams.GPRS_PAGE));
-        fieldsList.get(5).setText(settings.getSet().get(pktParams.GPRS_TIMEOUT));
-        fieldsList.get(6).setText(settings.getSet().get(pktParams.USER1_PASSW));
-        fieldsList.get(7).setText(settings.getSet().get(pktParams.USER1_PHONE));
-        fieldsList.get(8).setText(settings.getSet().get(pktParams.USER2_PASSW));
-        fieldsList.get(9).setText(settings.getSet().get(pktParams.USER2_PHONE));
-        fieldsList.get(10).setText(settings.getSet().get(pktParams.USER3_PASSW));
-        fieldsList.get(11).setText(settings.getSet().get(pktParams.USER3_PHONE));
+        fieldsList.get(0).setText(Elements.getValueByName(pktParams.GSM_SERVER));
+        fieldsList.get(1).setText(Elements.getValueByName(pktParams.GSM_MONEY_QUERY));
+        fieldsList.get(2).setText(Elements.getValueByName(pktParams.GPRS_SERVER));
+        fieldsList.get(3).setText(Elements.getValueByName(pktParams.GPRS_PORT));
+        fieldsList.get(4).setText(Elements.getValueByName(pktParams.GPRS_PAGE));
+        fieldsList.get(5).setText(Elements.getValueByName(pktParams.GPRS_TIMEOUT));
+        fieldsList.get(6).setText(Elements.getValueByName(pktParams.USER1_PASSW));
+        fieldsList.get(7).setText(Elements.getValueByName(pktParams.USER1_PHONE));
+        fieldsList.get(8).setText(Elements.getValueByName(pktParams.USER2_PASSW));
+        fieldsList.get(9).setText(Elements.getValueByName(pktParams.USER2_PHONE));
+        fieldsList.get(10).setText(Elements.getValueByName(pktParams.USER3_PASSW));
+        fieldsList.get(11).setText(Elements.getValueByName(pktParams.USER3_PHONE));
 
         for(int i=0;i<fieldsList.size();i++){
             fieldsList.get(i).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(i))));

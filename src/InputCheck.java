@@ -27,7 +27,7 @@ public class InputCheck {
                 }
             }
             if(key != "") {
-                settings.getSet().put(key, text);
+
             }
             textField.setForeground(Color.black);
             saveButton.setEnabled(true);

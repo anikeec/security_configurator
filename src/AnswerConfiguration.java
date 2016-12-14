@@ -103,10 +103,10 @@ public class AnswerConfiguration extends SwingWorker{
                 strs[1] = "";
                 packetAnswer = new byte[]{'o','k'};
 
-                strs[0] = settings.readParameterName(inputUnwrapInnerPacket.getAddress());
+                strs[0] = Elements.getNameById(inputUnwrapInnerPacket.getAddress());
                 if(strs[0] != "Error.") {
                     strs[1] = new String(inputUnwrapInnerPacket.getData());
-                    packetAnswer = settings.getSet().get(strs[0]).getBytes();
+                    packetAnswer = Elements.getValueByName(strs[0]).getBytes();
                 }
 
             } while(inputUnwrapInnerPacket == null);

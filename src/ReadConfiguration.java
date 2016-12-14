@@ -36,9 +36,8 @@ public class ReadConfiguration extends SwingWorker{
 
             message = "Read. Send request. ";
 
-            //data = settings.readParameterField(ptr);
-            data = settings.getSet().get(settings.readParameterName(ptr)).getBytes();
-            message +=  settings.readParameterName(ptr);
+            data = Elements.getValueByName(Elements.getNameById(ptr)).getBytes();
+            message +=  Elements.getNameById(ptr);
 
             try {
                 innerPacketToSend = new InnerPacket(ConfigCommand.COMMAND_READ, ptr, data);
@@ -115,7 +114,7 @@ public class ReadConfiguration extends SwingWorker{
             strs[0] = "";
             strs[1] = "";
 
-            strs[0] = settings.readParameterName(inputUnwrapInnerPacket.getAddress());
+            strs[0] = Elements.getNameById(inputUnwrapInnerPacket.getAddress());
             if(strs[0] != "Error.") {
                 strs[1] = new String(inputUnwrapInnerPacket.getData());
                 publish(strs);
