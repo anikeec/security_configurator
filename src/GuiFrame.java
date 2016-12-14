@@ -323,103 +323,103 @@ public class GuiFrame extends JFrame{
     }
     void initComboBoxes(){
         for(int i=0;i<ZONES_STATES.length;i++) {
-            Gui.getComboByName(pktParams.ZONE1_STATE_NORM).addItem(ZONES_STATES[i]);
-            Gui.getComboByName(pktParams.ZONE2_STATE_NORM).addItem(ZONES_STATES[i]);
-            Gui.getComboByName(pktParams.ZONE3_STATE_NORM).addItem(ZONES_STATES[i]);
+            Gui.getComboByName(Param.ZONE1_STATE_NORM).addItem(ZONES_STATES[i]);
+            Gui.getComboByName(Param.ZONE2_STATE_NORM).addItem(ZONES_STATES[i]);
+            Gui.getComboByName(Param.ZONE3_STATE_NORM).addItem(ZONES_STATES[i]);
         }
         for(int i=0;i<OUTS_STATES.length;i++) {
-            Gui.getComboByName(pktParams.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
-            Gui.getComboByName(pktParams.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
-            Gui.getComboByName(pktParams.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
+            Gui.getComboByName(Param.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
+            Gui.getComboByName(Param.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
+            Gui.getComboByName(Param.OUT1_STATE_NORM).addItem(OUTS_STATES[i]);
         }
     }
 
     void initCheckBoxes(){
 
-        Gui.getCheckboxByName(pktParams.GPRS_ON_OFF).setText("GPRS on");
-        Gui.getCheckboxByName(pktParams.ZONE1_ON_OFF).setText("Zone 1");
-        Gui.getCheckboxByName(pktParams.ZONE2_ON_OFF).setText("Zone 2");
-        Gui.getCheckboxByName(pktParams.ZONE3_ON_OFF).setText("Zone 3");
-        Gui.getCheckboxByName(pktParams.OUT1_ON_OFF).setText("Out 1");
-        Gui.getCheckboxByName(pktParams.OUT2_ON_OFF).setText("Out 2");
-        Gui.getCheckboxByName(pktParams.OUT3_ON_OFF).setText("Out 3");
-        Gui.getCheckboxByName(pktParams.USER1_ON_OFF).setText("User 1");
-        Gui.getCheckboxByName(pktParams.USER2_ON_OFF).setText("User 2");
-        Gui.getCheckboxByName(pktParams.USER3_ON_OFF).setText("User 3");
+        Gui.getCheckboxByName(Param.GPRS_ON_OFF).setText("GPRS on");
+        Gui.getCheckboxByName(Param.ZONE1_ON_OFF).setText("Zone 1");
+        Gui.getCheckboxByName(Param.ZONE2_ON_OFF).setText("Zone 2");
+        Gui.getCheckboxByName(Param.ZONE3_ON_OFF).setText("Zone 3");
+        Gui.getCheckboxByName(Param.OUT1_ON_OFF).setText("Out 1");
+        Gui.getCheckboxByName(Param.OUT2_ON_OFF).setText("Out 2");
+        Gui.getCheckboxByName(Param.OUT3_ON_OFF).setText("Out 3");
+        Gui.getCheckboxByName(Param.USER1_ON_OFF).setText("User 1");
+        Gui.getCheckboxByName(Param.USER2_ON_OFF).setText("User 2");
+        Gui.getCheckboxByName(Param.USER3_ON_OFF).setText("User 3");
 
-        if(Gui.getValueByName(pktParams.GPRS_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.GPRS_ON_OFF).setSelected(true);
+        if(Gui.getValueByName(Param.GPRS_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.GPRS_ON_OFF).setSelected(true);
         } else {
-            Gui.getCheckboxByName(pktParams.GPRS_ON_OFF).setSelected(false);
+            Gui.getCheckboxByName(Param.GPRS_ON_OFF).setSelected(false);
         }
-        if(Gui.getValueByName(pktParams.ZONE1_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.ZONE1_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.ZONE1_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.ZONE1_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.ZONE1_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.ZONE1_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.ZONE1_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.ZONE1_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.ZONE1_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.ZONE1_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.ZONE2_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.ZONE2_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.ZONE2_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.ZONE2_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.ZONE2_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.ZONE2_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.ZONE2_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.ZONE2_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.ZONE2_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.ZONE2_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.ZONE3_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.ZONE3_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.ZONE3_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.ZONE3_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.ZONE3_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.ZONE3_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.ZONE3_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.ZONE3_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.ZONE3_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.ZONE3_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.OUT1_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.OUT1_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.OUT1_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.OUT1_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.OUT1_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.OUT1_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.OUT1_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.OUT1_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.OUT1_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.OUT1_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.OUT2_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.OUT2_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.OUT2_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.OUT2_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.OUT2_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.OUT2_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.OUT2_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.OUT2_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.OUT2_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.OUT2_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.OUT3_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.OUT3_ON_OFF).setSelected(true);
-            Gui.getComboByName(pktParams.OUT3_STATE_NORM).setEnabled(true);
+        if(Gui.getValueByName(Param.OUT3_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.OUT3_ON_OFF).setSelected(true);
+            Gui.getComboByName(Param.OUT3_STATE_NORM).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.OUT3_ON_OFF).setSelected(false);
-            Gui.getComboByName(pktParams.OUT3_STATE_NORM).setEnabled(false);
+            Gui.getCheckboxByName(Param.OUT3_ON_OFF).setSelected(false);
+            Gui.getComboByName(Param.OUT3_STATE_NORM).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.USER1_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.USER1_ON_OFF).setSelected(true);
-            Gui.getFieldByName(pktParams.USER1_PASSW).setEnabled(true);
-            Gui.getFieldByName(pktParams.USER1_PHONE).setEnabled(true);
+        if(Gui.getValueByName(Param.USER1_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.USER1_ON_OFF).setSelected(true);
+            Gui.getFieldByName(Param.USER1_PASSW).setEnabled(true);
+            Gui.getFieldByName(Param.USER1_PHONE).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.USER1_ON_OFF).setSelected(false);
-            Gui.getFieldByName(pktParams.USER1_PASSW).setEnabled(false);
-            Gui.getFieldByName(pktParams.USER1_PHONE).setEnabled(false);
+            Gui.getCheckboxByName(Param.USER1_ON_OFF).setSelected(false);
+            Gui.getFieldByName(Param.USER1_PASSW).setEnabled(false);
+            Gui.getFieldByName(Param.USER1_PHONE).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.USER2_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.USER2_ON_OFF).setSelected(true);
-            Gui.getFieldByName(pktParams.USER2_PASSW).setEnabled(true);
-            Gui.getFieldByName(pktParams.USER2_PHONE).setEnabled(true);
+        if(Gui.getValueByName(Param.USER2_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.USER2_ON_OFF).setSelected(true);
+            Gui.getFieldByName(Param.USER2_PASSW).setEnabled(true);
+            Gui.getFieldByName(Param.USER2_PHONE).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.USER2_ON_OFF).setSelected(false);
-            Gui.getFieldByName(pktParams.USER2_PASSW).setEnabled(false);
-            Gui.getFieldByName(pktParams.USER2_PHONE).setEnabled(false);
+            Gui.getCheckboxByName(Param.USER2_ON_OFF).setSelected(false);
+            Gui.getFieldByName(Param.USER2_PASSW).setEnabled(false);
+            Gui.getFieldByName(Param.USER2_PHONE).setEnabled(false);
         }
-        if(Gui.getValueByName(pktParams.USER3_ON_OFF).equals("1")) {
-            Gui.getCheckboxByName(pktParams.USER3_ON_OFF).setSelected(true);
-            Gui.getFieldByName(pktParams.USER3_PASSW).setEnabled(true);
-            Gui.getFieldByName(pktParams.USER3_PHONE).setEnabled(true);
+        if(Gui.getValueByName(Param.USER3_ON_OFF).equals("1")) {
+            Gui.getCheckboxByName(Param.USER3_ON_OFF).setSelected(true);
+            Gui.getFieldByName(Param.USER3_PASSW).setEnabled(true);
+            Gui.getFieldByName(Param.USER3_PHONE).setEnabled(true);
         } else {
-            Gui.getCheckboxByName(pktParams.USER3_ON_OFF).setSelected(false);
-            Gui.getFieldByName(pktParams.USER3_PASSW).setEnabled(false);
-            Gui.getFieldByName(pktParams.USER3_PHONE).setEnabled(false);
+            Gui.getCheckboxByName(Param.USER3_ON_OFF).setSelected(false);
+            Gui.getFieldByName(Param.USER3_PASSW).setEnabled(false);
+            Gui.getFieldByName(Param.USER3_PHONE).setEnabled(false);
         }
     }
 
@@ -438,34 +438,34 @@ public class GuiFrame extends JFrame{
     }
 
     void initGuiElements(){
-        Gui.addGuiByName(pktParams.GSM_SERVER, fieldsList.get(0), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GSM_MONEY_QUERY, fieldsList.get(1), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GPRS_SERVER, fieldsList.get(2), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GPRS_PORT, fieldsList.get(3), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GPRS_PAGE, fieldsList.get(4), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GPRS_TIMEOUT, fieldsList.get(5), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER1_PASSW, fieldsList.get(6), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER1_PHONE, fieldsList.get(7), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER2_PASSW, fieldsList.get(8), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER2_PHONE, fieldsList.get(9), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER3_PASSW, fieldsList.get(10), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.USER3_PHONE, fieldsList.get(11), Gui.guiType.TEXTFIELD);
-        Gui.addGuiByName(pktParams.GPRS_ON_OFF, checkBoxesList.get(0), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.ZONE1_ON_OFF, checkBoxesList.get(1), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.ZONE2_ON_OFF, checkBoxesList.get(2), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.ZONE3_ON_OFF, checkBoxesList.get(3), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.OUT1_ON_OFF, checkBoxesList.get(4), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.OUT2_ON_OFF, checkBoxesList.get(5), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.OUT3_ON_OFF, checkBoxesList.get(6), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.USER1_ON_OFF, checkBoxesList.get(7), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.USER2_ON_OFF, checkBoxesList.get(8), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.USER3_ON_OFF, checkBoxesList.get(9), Gui.guiType.CHECKBOX);
-        Gui.addGuiByName(pktParams.ZONE1_STATE_NORM, comboBoxesList.get(0), Gui.guiType.COMBOBOX);
-        Gui.addGuiByName(pktParams.ZONE2_STATE_NORM, comboBoxesList.get(1), Gui.guiType.COMBOBOX);
-        Gui.addGuiByName(pktParams.ZONE3_STATE_NORM, comboBoxesList.get(2), Gui.guiType.COMBOBOX);
-        Gui.addGuiByName(pktParams.OUT1_STATE_NORM, comboBoxesList.get(3), Gui.guiType.COMBOBOX);
-        Gui.addGuiByName(pktParams.OUT2_STATE_NORM, comboBoxesList.get(4), Gui.guiType.COMBOBOX);
-        Gui.addGuiByName(pktParams.OUT3_STATE_NORM, comboBoxesList.get(5), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.GSM_SERVER, fieldsList.get(0), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GSM_MONEY_QUERY, fieldsList.get(1), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GPRS_SERVER, fieldsList.get(2), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GPRS_PORT, fieldsList.get(3), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GPRS_PAGE, fieldsList.get(4), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GPRS_TIMEOUT, fieldsList.get(5), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER1_PASSW, fieldsList.get(6), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER1_PHONE, fieldsList.get(7), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER2_PASSW, fieldsList.get(8), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER2_PHONE, fieldsList.get(9), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER3_PASSW, fieldsList.get(10), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.USER3_PHONE, fieldsList.get(11), Gui.guiType.TEXTFIELD);
+        Gui.addGuiByName(Param.GPRS_ON_OFF, checkBoxesList.get(0), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.ZONE1_ON_OFF, checkBoxesList.get(1), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.ZONE2_ON_OFF, checkBoxesList.get(2), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.ZONE3_ON_OFF, checkBoxesList.get(3), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.OUT1_ON_OFF, checkBoxesList.get(4), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.OUT2_ON_OFF, checkBoxesList.get(5), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.OUT3_ON_OFF, checkBoxesList.get(6), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.USER1_ON_OFF, checkBoxesList.get(7), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.USER2_ON_OFF, checkBoxesList.get(8), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.USER3_ON_OFF, checkBoxesList.get(9), Gui.guiType.CHECKBOX);
+        Gui.addGuiByName(Param.ZONE1_STATE_NORM, comboBoxesList.get(0), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.ZONE2_STATE_NORM, comboBoxesList.get(1), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.ZONE3_STATE_NORM, comboBoxesList.get(2), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.OUT1_STATE_NORM, comboBoxesList.get(3), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.OUT2_STATE_NORM, comboBoxesList.get(4), Gui.guiType.COMBOBOX);
+        Gui.addGuiByName(Param.OUT3_STATE_NORM, comboBoxesList.get(5), Gui.guiType.COMBOBOX);
     }
 
     class ChangeListener implements PropertyChangeListener {
@@ -626,33 +626,33 @@ public class GuiFrame extends JFrame{
 
         public InputCheckInfo(JTextField textField) {
             this.textField = textField;
-            if( (textField == Gui.getGuiByName(pktParams.GSM_SERVER)) || // servers & page
-                (textField == Gui.getGuiByName(pktParams.GPRS_SERVER)) ||
-                (textField == Gui.getGuiByName(pktParams.GPRS_PAGE)) ) {
+            if( (textField == Gui.getGuiByName(Param.GSM_SERVER)) || // servers & page
+                (textField == Gui.getGuiByName(Param.GPRS_SERVER)) ||
+                (textField == Gui.getGuiByName(Param.GPRS_PAGE)) ) {
                 minLen = 5;
                 maxLen = 16;
             }
-            if(textField == Gui.getGuiByName(pktParams.GSM_MONEY_QUERY)){     // money query
+            if(textField == Gui.getGuiByName(Param.GSM_MONEY_QUERY)){     // money query
                 minLen = 5;
                 maxLen = 5;
             }
-            if(textField == Gui.getGuiByName(pktParams.GPRS_PORT)){     // port
+            if(textField == Gui.getGuiByName(Param.GPRS_PORT)){     // port
                 minLen = 2;
                 maxLen = 5;
             }
-            if(textField == Gui.getGuiByName(pktParams.GPRS_TIMEOUT)){     // timeout
+            if(textField == Gui.getGuiByName(Param.GPRS_TIMEOUT)){     // timeout
                 minLen = 1;
                 maxLen = 5;
             }
-            if( (textField == Gui.getGuiByName(pktParams.USER1_PASSW)) || // password
-                (textField == Gui.getGuiByName(pktParams.USER2_PASSW)) ||
-                (textField == Gui.getGuiByName(pktParams.USER3_PASSW)) ) {
+            if( (textField == Gui.getGuiByName(Param.USER1_PASSW)) || // password
+                (textField == Gui.getGuiByName(Param.USER2_PASSW)) ||
+                (textField == Gui.getGuiByName(Param.USER3_PASSW)) ) {
                 minLen = 6;
                 maxLen = 6;
             }
-            if( (textField == Gui.getGuiByName(pktParams.USER1_PHONE)) || // phone
-                (textField == Gui.getGuiByName(pktParams.USER2_PHONE)) ||
-                (textField == Gui.getGuiByName(pktParams.USER3_PHONE)) ) {
+            if( (textField == Gui.getGuiByName(Param.USER1_PHONE)) || // phone
+                (textField == Gui.getGuiByName(Param.USER2_PHONE)) ||
+                (textField == Gui.getGuiByName(Param.USER3_PHONE)) ) {
                 minLen = 13;
                 maxLen = 13;
             }

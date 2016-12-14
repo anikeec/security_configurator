@@ -1,7 +1,7 @@
 /**
  * Created by Ksusha on 04.12.2016.
  */
-public class pktParams {
+public class Param {
     public static final String GSM_SERVER       = "GSM_SERVER";
     public static final String GSM_MONEY_QUERY  = "GSM_MONEY_QUERY";
     public static final String GPRS_SERVER      = "GPRS_SERVER";
