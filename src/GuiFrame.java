@@ -3,18 +3,11 @@ import jssc.SerialPortException;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +16,21 @@ import java.util.Map;
  */
 public class GuiFrame extends JFrame{
 
+    private final int COMBO_BOX_SIZE = 150;
+    private final int CHECK_BOX_SIZE = 80;
+    private final int LABEL_F_SIZE = 100;
+    private final int LABEL_B_SIZE = 100;
+    private final int FIELD_BIG_SIZE = 150;
+    private final int FIELD_SM_SIZE = 120;
+    private final int GAP_B_SIZE = 30;
+    private final String[] ZONES_STATES = new String[]{"Open","Close"};
+    private final String[] OUTS_STATES = new String[]{"On","Off"};
+
     private Map<String,Object> map;
 
     private WriteConfiguration  writeConfig;
     private AnswerConfiguration answerConfig;
+    private ReadConfiguration   readConfig;
 
     public JPanel           panelTop;
     private JPanel          panelCenter;
@@ -34,27 +38,22 @@ public class GuiFrame extends JFrame{
     private GroupLayout     panelCenterLayout;
     private JButton         buttonOpen;
     private JButton         buttonSave;
-    private JButton         buttonRead;
+    public JButton          buttonRead;
     public JButton          buttonWrite;
     public JButton          buttonPortOpenClose;
     private JComboBox       comboBox;
-    private JLabel          labelGsmServer;
-    private JTextField      inputGsmServer;
-    private JLabel          labelGsmMoneyQuery;
-    private JTextField      inputGsmMoneyQuery;
-    private JLabel          labelGprsServer;
-    private JTextField      inputGprsServer;
-    private JLabel          labelGprsPort;
-    private JTextField      inputGprsPort;
     private JLabel          labelGprsPage;
     private JTextField      inputGprsPage;
-    private JLabel          labelGprsTimeout;
-    private JTextField      inputGprsTimeout;
     private JScrollPane     scrollpane;
 
     public JTextArea textArea;
 
     private ChangeListener  propertyChangeListener;
+
+    ArrayList<JLabel>       labelList = new ArrayList<JLabel>();
+    ArrayList<JTextField>   fieldsList = new ArrayList<JTextField>();
+    ArrayList<JCheckBox>    checkBoxesList = new ArrayList<JCheckBox>();
+    ArrayList<JComboBox>    comboBoxesList = new ArrayList<JComboBox>();
 
     public Map<String, Object> getGui() {
         return map;
@@ -86,38 +85,43 @@ public class GuiFrame extends JFrame{
         panelTop = new JPanel();
         textArea = new JTextArea();
         scrollpane = new JScrollPane(textArea,ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        labelGsmServer = new JLabelBorder();
-        inputGsmServer = new LimitTextField();
-        labelGsmMoneyQuery = new JLabelBorder();
-        inputGsmMoneyQuery = new LimitTextField();
-        labelGprsServer = new JLabelBorder();
-        inputGprsServer = new LimitTextField();
-        labelGprsPort = new JLabelBorder();
-        inputGprsPort = new LimitTextField();
-        labelGprsTimeout = new JLabelBorder();
-        inputGprsTimeout = new LimitTextField();
+
+        for(int i=0;i<20;i++){//settings.getSet().size()
+            labelList.add(new JLabelBorder());
+            labelList.get(i).setText("label" + i);
+        }
+
+        for(int i=0;i<20;i++){
+            fieldsList.add(new LimitTextField());
+            fieldsList.get(i).setText("field" + i);
+        }
+
+        for(int i=0;i<20;i++){
+            checkBoxesList.add(new JCheckBox());
+            checkBoxesList.get(i).setText("check" + i);
+        }
+
+        for(int i=0;i<20;i++){
+            comboBoxesList.add(new JComboBox());
+        }
+
         panelCenter = new JPanel();
 
-        map.put(pktParams.GSM_SERVER,inputGsmServer);
-        map.put(pktParams.GSM_MONEY_QUERY,inputGsmMoneyQuery);
-        map.put(pktParams.GPRS_SERVER,inputGprsServer);
-        map.put(pktParams.GPRS_PORT,inputGprsPort);
+        map.put(pktParams.GSM_SERVER,fieldsList.get(0));
+        map.put(pktParams.GSM_MONEY_QUERY,fieldsList.get(1));
+        map.put(pktParams.GPRS_SERVER,fieldsList.get(2));
+        map.put(pktParams.GPRS_PORT,fieldsList.get(3));
 
         buttonOpen.setText("Open File");
         buttonSave.setText("Save File");
         buttonRead.setText("Read Data");
         buttonWrite.setText("Write Data");
         buttonPortOpenClose.setText("Port Open");
-        labelGsmServer.setText("GSM server address (www.kyivstar.net):  ");
-        inputGsmServer.setText(settings.getSet().get(pktParams.GSM_SERVER));
-        labelGsmMoneyQuery.setText("GSM check money query (*111#):  ");
-        inputGsmMoneyQuery.setText(settings.getSet().get(pktParams.GSM_MONEY_QUERY));
-        labelGprsServer.setText("GPRS server address:  ");
-        inputGprsServer.setText(settings.getSet().get(pktParams.GPRS_SERVER));
-        labelGprsPort.setText("GPRS port number:  ");
-        inputGprsPort.setText(settings.getSet().get(pktParams.GPRS_PORT));
-        labelGprsTimeout.setText("GPRS update timeout(seconds):  ");
-        inputGprsTimeout.setText("0");
+
+        initLabels();
+        initComboBoxes();
+        initCheckBoxes();
+        initFields();
 
         buttonRead.setEnabled(false);
         buttonWrite.setEnabled(false);
@@ -127,24 +131,18 @@ public class GuiFrame extends JFrame{
         panelTop.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panelTop.setPreferredSize(new Dimension(getContentPane().getWidth(),100));
         scrollpane.setAutoscrolls(true);
-        panelCenterLayout = new GroupLayout(panelCenter);
-        panelCenter.setLayout(panelCenterLayout);
-        panelCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         buttonOpen.addActionListener(new openButtonAction());
         buttonSave.addActionListener(new saveButtonAction());
         buttonRead.addActionListener(new readButtonAction());
         buttonWrite.addActionListener(new writeButtonAction());
         buttonPortOpenClose.addActionListener(new portOpenCloseButtonAction());
-        //comboBox.addActionListener(new comboBoxAction());
-        //comboBox.addItemListener(new comboBoxItem());
-
 
         textArea.addPropertyChangeListener(propertyChangeListener);
-        inputGsmServer.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmServer)));
-        inputGsmServer.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmServer)));
-        inputGsmMoneyQuery.addFocusListener(new inputFocusListener(new InputCheckInfo(inputGsmMoneyQuery)));
-        inputGsmMoneyQuery.addCaretListener(new inputCaretListener(new InputCheckInfo(inputGsmMoneyQuery)));
+        fieldsList.get(0).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(0))));
+        fieldsList.get(0).addCaretListener(new inputCaretListener(new InputCheckInfo(fieldsList.get(0))));
+        fieldsList.get(1).addFocusListener(new inputFocusListener(new InputCheckInfo(fieldsList.get(1))));
+        fieldsList.get(1).addCaretListener(new inputCaretListener(new InputCheckInfo(fieldsList.get(1))));
 
         panelTop.add(buttonOpen);
         panelTop.add(buttonSave);
@@ -156,46 +154,304 @@ public class GuiFrame extends JFrame{
         getContentPane().add(panelTop,BorderLayout.NORTH);
         getContentPane().add(scrollpane,BorderLayout.SOUTH);
 
-        panelCenterLayout.setHorizontalGroup(panelCenterLayout.createSequentialGroup()
-                .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+        panelCenterLayout = new GroupLayout(panelCenter);
+        panelCenter.setLayout(panelCenterLayout);
+        panelCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        panelCenterLayout.setHorizontalGroup(
+                panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(panelCenterLayout.createSequentialGroup()
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                .addComponent(labelGsmServer)
-                                                .addComponent(labelGsmMoneyQuery)
-                                                .addComponent(labelGprsServer)
-                                                .addComponent(labelGprsPort)
-                                                .addComponent(labelGprsTimeout))
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                                .addComponent(inputGsmServer)
-                                                .addComponent(inputGsmMoneyQuery)
-                                                .addComponent(inputGprsServer)
-                                                .addComponent(inputGprsPort)
-                                                .addComponent(inputGprsTimeout))
-                        )));
-        //panelCenterLayout.linkSize(SwingConstants.HORIZONTAL, inputGsmServer, inputGsmMoneyQuery);
-        panelCenterLayout.setVerticalGroup(panelCenterLayout.createSequentialGroup()
-                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addGroup(panelCenterLayout.createSequentialGroup()
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(labelGsmServer)
-                                                .addComponent(inputGsmServer))
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(labelGsmMoneyQuery)
-                                                .addComponent(inputGsmMoneyQuery))
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(labelGprsServer)
-                                                .addComponent(inputGprsServer))
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(labelGprsPort)
-                                                .addComponent(inputGprsPort))
-                                        .addGroup(panelCenterLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                .addComponent(labelGprsTimeout)
-                                                .addComponent(inputGprsTimeout))))
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                                                .addComponent(checkBoxesList.get(1), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                .addComponent(labelList.get(6), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                .addComponent(comboBoxesList.get(0), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                                                .addComponent(checkBoxesList.get(0), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCenterLayout.createSequentialGroup()
+                                                                                .addComponent(labelList.get(2), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                                .addComponent(fieldsList.get(2), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                                .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                                .addComponent(labelList.get(3), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE))
+                                                                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                                                                .addComponent(labelList.get(4), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                                .addComponent(fieldsList.get(4), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                                .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                                .addComponent(labelList.get(5), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE)))))
+                                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(fieldsList.get(5), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE)
+                                                        .addComponent(fieldsList.get(3), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE))
+                                                )
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                        .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(9), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(16), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(fieldsList.get(10), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                        .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                        .addComponent(labelList.get(17), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE)
+                                                                        .addComponent(fieldsList.get(11), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(8), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(14), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(fieldsList.get(8), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                        .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                        .addComponent(labelList.get(15), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE)
+                                                                        .addComponent(fieldsList.get(9), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(7), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(12), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(fieldsList.get(6), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                        .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                        .addComponent(labelList.get(13), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE)
+                                                                        .addComponent(fieldsList.get(7), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(2), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(7), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(comboBoxesList.get(1), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(3), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(8), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(comboBoxesList.get(2), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(4), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(9), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(comboBoxesList.get(3), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(5), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(10), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(comboBoxesList.get(4), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addComponent(checkBoxesList.get(6), CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(11), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(comboBoxesList.get(5), COMBO_BOX_SIZE, COMBO_BOX_SIZE, COMBO_BOX_SIZE))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCenterLayout.createSequentialGroup()
+                                                                        .addGap(CHECK_BOX_SIZE, CHECK_BOX_SIZE, CHECK_BOX_SIZE)
+                                                                        .addComponent(labelList.get(0), LABEL_F_SIZE, LABEL_F_SIZE, LABEL_F_SIZE)
+                                                                        .addComponent(fieldsList.get(0), FIELD_BIG_SIZE, FIELD_BIG_SIZE, FIELD_BIG_SIZE)
+                                                                        .addGap(GAP_B_SIZE, GAP_B_SIZE, GAP_B_SIZE)
+                                                                        .addComponent(labelList.get(1), LABEL_B_SIZE, LABEL_B_SIZE, LABEL_B_SIZE)
+                                                                        .addComponent(fieldsList.get(1), FIELD_SM_SIZE, FIELD_SM_SIZE, FIELD_SM_SIZE)))
+                                                )))
+        );
+        panelCenterLayout.setVerticalGroup(
+                panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(panelCenterLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(0))
+                                        .addComponent(fieldsList.get(0))
+                                        .addComponent(labelList.get(1))
+                                        .addComponent(fieldsList.get(1)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(2))
+                                        .addComponent(fieldsList.get(2))
+                                        .addComponent(labelList.get(3))
+                                        .addComponent(fieldsList.get(3))
+                                        .addComponent(checkBoxesList.get(0), javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(4))
+                                        .addComponent(fieldsList.get(4))
+                                        .addComponent(labelList.get(5))
+                                        .addComponent(fieldsList.get(5)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(6))
+                                        .addComponent(checkBoxesList.get(1))
+                                        .addComponent(comboBoxesList.get(0)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(7))
+                                        .addComponent(checkBoxesList.get(2))
+                                        .addComponent(comboBoxesList.get(1)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(8))
+                                        .addComponent(checkBoxesList.get(3))
+                                        .addComponent(comboBoxesList.get(2)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(9))
+                                        .addComponent(checkBoxesList.get(4))
+                                        .addComponent(comboBoxesList.get(3)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(10))
+                                        .addComponent(checkBoxesList.get(5))
+                                        .addComponent(comboBoxesList.get(4)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(11))
+                                        .addComponent(checkBoxesList.get(6))
+                                        .addComponent(comboBoxesList.get(5)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(12))
+                                        .addComponent(fieldsList.get(6))
+                                        .addComponent(labelList.get(13))
+                                        .addComponent(fieldsList.get(7))
+                                        .addComponent(checkBoxesList.get(7)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(14))
+                                        .addComponent(fieldsList.get(8))
+                                        .addComponent(labelList.get(15))
+                                        .addComponent(fieldsList.get(9))
+                                        .addComponent(checkBoxesList.get(8)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(labelList.get(16))
+                                        .addComponent(fieldsList.get(10))
+                                        .addComponent(labelList.get(17))
+                                        .addComponent(fieldsList.get(11))
+                                        .addComponent(checkBoxesList.get(9)))
+                                .addContainerGap(137, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelCenter,BorderLayout.CENTER);
+        getContentPane().add(panelCenter, BorderLayout.CENTER);
 
         setVisible(true);
+    }
+
+    void initLabels() {
+        labelList.get(0).setText("GSM server");
+        labelList.get(1).setText("GSM m.query");
+        labelList.get(2).setText("GPRS server");
+        labelList.get(3).setText("GPRS port");
+        labelList.get(4).setText("GPRS page");
+        labelList.get(5).setText("GPRS time(s)");
+        labelList.get(6).setText("State normal");
+        labelList.get(7).setText("State normal");
+        labelList.get(8).setText("State normal");
+        labelList.get(9).setText("State normal");
+        labelList.get(10).setText("State normal");
+        labelList.get(11).setText("State normal");
+        labelList.get(12).setText("Password");
+        labelList.get(13).setText("          Phone");
+        labelList.get(14).setText("Password");
+        labelList.get(15).setText("          Phone");
+        labelList.get(16).setText("Password");
+        labelList.get(17).setText("          Phone");
+    }
+    void initComboBoxes(){
+        for(int i=0;i<ZONES_STATES.length;i++) {
+            comboBoxesList.get(0).addItem(ZONES_STATES[i]);
+            comboBoxesList.get(1).addItem(ZONES_STATES[i]);
+            comboBoxesList.get(2).addItem(ZONES_STATES[i]);
+        }
+        for(int i=0;i<OUTS_STATES.length;i++) {
+            comboBoxesList.get(3).addItem(OUTS_STATES[i]);
+            comboBoxesList.get(4).addItem(OUTS_STATES[i]);
+            comboBoxesList.get(5).addItem(OUTS_STATES[i]);
+        }
+    }
+
+    void initCheckBoxes(){
+        checkBoxesList.get(0).setText("GPRS on");
+        checkBoxesList.get(1).setText("Zone 1");
+        checkBoxesList.get(2).setText("Zone 2");
+        checkBoxesList.get(3).setText("Zone 3");
+        checkBoxesList.get(4).setText("Out 1");
+        checkBoxesList.get(5).setText("Out 2");
+        checkBoxesList.get(6).setText("Out 3");
+        checkBoxesList.get(7).setText("User 1");
+        checkBoxesList.get(8).setText("User 2");
+        checkBoxesList.get(9).setText("User 3");
+
+        if(settings.getSet().get(pktParams.GPRS_ON_OFF).equals("1")) {
+            checkBoxesList.get(0).setSelected(true);
+        } else {
+            checkBoxesList.get(0).setSelected(false);
+        }
+        if(settings.getSet().get(pktParams.ZONE1_ON_OFF).equals("1")) {
+            checkBoxesList.get(1).setSelected(true);
+            comboBoxesList.get(0).setEnabled(true);
+        } else {
+            checkBoxesList.get(1).setSelected(false);
+            comboBoxesList.get(0).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.ZONE2_ON_OFF).equals("1")) {
+            checkBoxesList.get(2).setSelected(true);
+            comboBoxesList.get(1).setEnabled(true);
+        } else {
+            checkBoxesList.get(2).setSelected(false);
+            comboBoxesList.get(1).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.ZONE3_ON_OFF).equals("1")) {
+            checkBoxesList.get(3).setSelected(true);
+            comboBoxesList.get(2).setEnabled(true);
+        } else {
+            checkBoxesList.get(3).setSelected(false);
+            comboBoxesList.get(2).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.OUT1_ON_OFF).equals("1")) {
+            checkBoxesList.get(4).setSelected(true);
+            comboBoxesList.get(3).setEnabled(true);
+        } else {
+            checkBoxesList.get(4).setSelected(false);
+            comboBoxesList.get(3).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.OUT2_ON_OFF).equals("1")) {
+            checkBoxesList.get(5).setSelected(true);
+            comboBoxesList.get(4).setEnabled(true);
+        } else {
+            checkBoxesList.get(5).setSelected(false);
+            comboBoxesList.get(4).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.OUT3_ON_OFF).equals("1")) {
+            checkBoxesList.get(6).setSelected(true);
+            comboBoxesList.get(5).setEnabled(true);
+        } else {
+            checkBoxesList.get(6).setSelected(false);
+            comboBoxesList.get(5).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.USER1_ON_OFF).equals("1")) {
+            checkBoxesList.get(7).setSelected(true);
+            fieldsList.get(6).setEnabled(true);
+            fieldsList.get(7).setEnabled(true);
+        } else {
+            checkBoxesList.get(7).setSelected(false);
+            fieldsList.get(6).setEnabled(false);
+            fieldsList.get(7).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.USER2_ON_OFF).equals("1")) {
+            checkBoxesList.get(8).setSelected(true);
+            fieldsList.get(8).setEnabled(true);
+            fieldsList.get(9).setEnabled(true);
+        } else {
+            checkBoxesList.get(8).setSelected(false);
+            fieldsList.get(8).setEnabled(false);
+            fieldsList.get(9).setEnabled(false);
+        }
+        if(settings.getSet().get(pktParams.USER3_ON_OFF).equals("1")) {
+            checkBoxesList.get(9).setSelected(true);
+            fieldsList.get(10).setEnabled(true);
+            fieldsList.get(11).setEnabled(true);
+        } else {
+            checkBoxesList.get(9).setSelected(false);
+            fieldsList.get(10).setEnabled(false);
+            fieldsList.get(11).setEnabled(false);
+        }
+    }
+
+    void initFields(){
+        fieldsList.get(0).setText(settings.getSet().get(pktParams.GSM_SERVER));
+        fieldsList.get(1).setText(settings.getSet().get(pktParams.GSM_MONEY_QUERY));
+        fieldsList.get(2).setText(settings.getSet().get(pktParams.GPRS_SERVER));
+        fieldsList.get(3).setText(settings.getSet().get(pktParams.GPRS_PORT));
+        fieldsList.get(4).setText(settings.getSet().get(pktParams.GPRS_PAGE));
+        fieldsList.get(5).setText(settings.getSet().get(pktParams.GPRS_TIMEOUT));
+        fieldsList.get(6).setText(settings.getSet().get(pktParams.USER1_PASSW));
+        fieldsList.get(7).setText(settings.getSet().get(pktParams.USER1_PHONE));
+        fieldsList.get(8).setText(settings.getSet().get(pktParams.USER2_PASSW));
+        fieldsList.get(9).setText(settings.getSet().get(pktParams.USER2_PHONE));
+        fieldsList.get(10).setText(settings.getSet().get(pktParams.USER3_PASSW));
+        fieldsList.get(11).setText(settings.getSet().get(pktParams.USER3_PHONE));
     }
 
     class ChangeListener implements PropertyChangeListener {
@@ -339,9 +595,10 @@ public class GuiFrame extends JFrame{
         public void actionPerformed(ActionEvent e) {
             buttonWrite.setEnabled(false);
             buttonRead.setEnabled(false);
-            //buttonPortOpenClose.setEnabled(false);
-            answerConfig = new AnswerConfiguration();
-            answerConfig.execute();
+            //answerConfig = new AnswerConfiguration();
+            //answerConfig.execute();
+            readConfig = new ReadConfiguration();
+            readConfig.execute();
 
             //buttonWrite.setEnabled(true);
             //buttonRead.setEnabled(true);
@@ -355,11 +612,11 @@ public class GuiFrame extends JFrame{
 
         public InputCheckInfo(JTextField textField) {
             this.textField = textField;
-            if(textField == inputGsmServer){
+            if(textField == fieldsList.get(0)){
                 minLen = 5;
                 maxLen = 16;
             }
-            if(textField == inputGsmMoneyQuery){
+            if(textField == fieldsList.get(1)){
                 minLen = 5;
                 maxLen = 6;
             }
