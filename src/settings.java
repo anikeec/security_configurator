@@ -65,7 +65,7 @@ public class settings {
         map.put(pktParams.OUT2_STATE_NORM,"0");
         map.put(pktParams.OUT3_ON_OFF,"0");
         map.put(pktParams.OUT3_STATE_NORM,"0");
-        map.put(pktParams.USER1_ON_OFF,"0");
+        map.put(pktParams.USER1_ON_OFF,"1");
         map.put(pktParams.USER1_PASSW,"123456");
         map.put(pktParams.USER1_PHONE,"+380502103706");
         map.put(pktParams.USER2_ON_OFF,"0");
@@ -75,101 +75,7 @@ public class settings {
         map.put(pktParams.USER3_PASSW,"");
         map.put(pktParams.USER3_PHONE,"");
     }
-    /*
-    public static byte[] readParameterField(int parameterNumber){
-        byte[] data;
 
-        switch(parameterNumber){
-            case settings.N_GSM_SERVER:
-                data = settings.getSet().get(pktParams.GSM_SERVER).getBytes();
-                break;
-            case settings.N_GSM_MONEY_QUERY:
-                data = settings.getSet().get(pktParams.GSM_MONEY_QUERY).getBytes();
-                break;
-            case settings.N_GPRS_SERVER:
-                data = settings.getSet().get(pktParams.GPRS_SERVER).getBytes();
-                break;
-            case settings.N_GPRS_PORT:
-                data = settings.getSet().get(pktParams.GPRS_PORT).getBytes();
-                break;
-            case settings.N_GPRS_PAGE:
-                data = settings.getSet().get(pktParams.GPRS_PAGE).getBytes();
-                break;
-            case settings.N_GPRS_TIMEOUT:
-                data = settings.getSet().get(pktParams.GPRS_TIMEOUT).getBytes();
-                break;
-            case settings.N_GPRS_ON_OFF:
-                data = settings.getSet().get(pktParams.GPRS_ON_OFF).getBytes();
-                break;
-            case settings.N_ZONE1_ON_OFF:
-                data = settings.getSet().get(pktParams.ZONE1_ON_OFF).getBytes();
-                break;
-            case settings.N_ZONE1_STATE_NORM:
-                data = settings.getSet().get(pktParams.ZONE1_STATE_NORM).getBytes();
-                break;
-            case settings.N_ZONE2_ON_OFF:
-                data = settings.getSet().get(pktParams.ZONE2_ON_OFF).getBytes();
-                break;
-            case settings.N_ZONE2_STATE_NORM:
-                data = settings.getSet().get(pktParams.ZONE2_STATE_NORM).getBytes();
-                break;
-            case settings.N_ZONE3_ON_OFF:
-                data = settings.getSet().get(pktParams.ZONE2_ON_OFF).getBytes();
-                break;
-            case settings.N_ZONE3_STATE_NORM:
-                data = settings.getSet().get(pktParams.ZONE3_STATE_NORM).getBytes();
-                break;
-            case settings.N_OUT1_ON_OFF:
-                data = settings.getSet().get(pktParams.OUT1_ON_OFF).getBytes();
-                break;
-            case settings.N_OUT1_STATE_NORM:
-                data = settings.getSet().get(pktParams.OUT1_STATE_NORM).getBytes();
-                break;
-            case settings.N_OUT2_ON_OFF:
-                data = settings.getSet().get(pktParams.OUT2_ON_OFF).getBytes();
-                break;
-            case settings.N_OUT2_STATE_NORM:
-                data = settings.getSet().get(pktParams.OUT2_STATE_NORM).getBytes();
-                break;
-            case settings.N_OUT3_ON_OFF:
-                data = settings.getSet().get(pktParams.OUT3_ON_OFF).getBytes();
-                break;
-            case settings.N_OUT3_STATE_NORM:
-                data = settings.getSet().get(pktParams.OUT3_STATE_NORM).getBytes();
-                break;
-            case settings.N_USER1_ON_OFF:
-                data = settings.getSet().get(pktParams.USER1_ON_OFF).getBytes();
-                break;
-            case settings.N_USER1_PASSW:
-                data = settings.getSet().get(pktParams.USER1_PASSW).getBytes();
-                break;
-            case settings.N_USER1_PHONE:
-                data = settings.getSet().get(pktParams.USER1_PHONE).getBytes();
-                break;
-            case settings.N_USER2_ON_OFF:
-                data = settings.getSet().get(pktParams.USER2_ON_OFF).getBytes();
-                break;
-            case settings.N_USER2_PASSW:
-                data = settings.getSet().get(pktParams.USER2_PASSW).getBytes();
-                break;
-            case settings.N_USER2_PHONE:
-                data = settings.getSet().get(pktParams.USER2_PHONE).getBytes();
-                break;
-            case settings.N_USER3_ON_OFF:
-                data = settings.getSet().get(pktParams.USER3_ON_OFF).getBytes();
-                break;
-            case settings.N_USER3_PASSW:
-                data = settings.getSet().get(pktParams.USER3_PASSW).getBytes();
-                break;
-            case settings.N_USER3_PHONE:
-                data = settings.getSet().get(pktParams.USER3_PHONE).getBytes();
-                break;
-            default:
-                data = new byte[]{0};
-        }
-        return data;
-    }
-*/
     public static String readParameterName(int parameterNumber){
         String name;
 
